@@ -84,7 +84,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col mt-0">
         <NavBar />
-        <main className="pt-17 md:pt-31 pb-18 md:pb-0">
+        <main className="pt-17 md:pt-31 pb-18 md:pb-0 overflow-x-hidden w-full">
           {children}
         </main>
         <MobileBottomNav />

@@ -89,8 +89,8 @@ const Hero = () => {
 
     return (
         <section className="relative w-full">
-            <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex">
+            <div className="overflow-hidden w-full" ref={emblaRef}>
+                <div className="flex w-full">
                     {heroSlides.map((slide) => (
                         <div
                             key={slide.id}
@@ -118,7 +118,7 @@ const Hero = () => {
                                 </div>
 
                                 {/* Content */}
-                                <div className="relative h-full max-w-7xl mx-auto px-5 md:px-10 pt-10 pb-16 md:py-24 flex flex-col justify-end md:justify-center">
+                                <div className="relative h-full max-w-7xl mx-auto px-5 md:px-10 pt-10 pb-16 md:py-24 flex flex-col justify-end md:justify-center text-center md:text-left">
                                     <div className="max-w-xl">
                                         {/* Tag */}
                                         <span className="inline-block font-accent text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase text-[#E5C177] mb-3 md:mb-5 border-b border-current pb-1">
