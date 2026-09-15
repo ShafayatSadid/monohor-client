@@ -27,10 +27,11 @@ const NavBar = () => {
     const wishlistCount = 0;
 
     const categories = [
+        { slug: "", name: "হোম" },
         { slug: "attar", name: "আতর" },
         { slug: "bakhur", name: "বাখুর" },
         { slug: "showpiece", name: "শোপিস" },
-        { slug: "hater-kaj", name: "কুশিটাকার কাজ" },
+        { slug: "hater-kaj", name: "কুশিটাকার শিল্প" },
     ];
 
     const handleSearch = (e) => {
@@ -47,9 +48,13 @@ const NavBar = () => {
         router.push("/");
     };
 
-    const isCategoryActive = (slug) =>
-        pathname === `/categories/${slug}` ||
-        pathname.includes(`category=${slug}`);
+    const isCategoryActive = (slug) => {
+        if (!slug) return pathname === "/";
+        return (
+            pathname === `/categories/${slug}` ||
+            pathname.includes(`category=${slug}`)
+        );
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-40 w-full bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-colors duration-300">
@@ -85,33 +90,34 @@ const NavBar = () => {
                 <div className="flex items-center gap-5 shrink-0">
 
                     <Link href="/wishlist" className="relative">
-                        {
-                            wishlistCount > 0 && (
-                                < Badge
-                                    content={wishlistCount}
-                                    color="primary"
-                                    shape="circle"
-                                    size="sm"
-                                >
-                                    <IoHeartOutline className="w-6 h-6 mr-1.5 text-foreground bg-background hover:text-primary transition" />
-                                </Badge>
-                            )
-                        }
+                        {wishlistCount > 0 && (
+                            <Badge
+                                content={wishlistCount}
+                                color="primary"
+                                shape="circle"
+                                size="sm"
+                            >
+                                <IoHeartOutline className="w-6 h-6 mr-1.5 text-foreground bg-background hover:text-primary transition" />
+                            </Badge>
+                        )}
+                        {wishlistCount === 0 && (
+                            <IoHeartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                        )}
                     </Link>
 
                     <Link href="/cart" className="relative">
-                        {
-                            cartCount > 0 && (<Badge
+                        {cartCount > 0 ? (
+                            <Badge
                                 content={cartCount}
                                 color="primary"
-
                                 shape="circle"
                                 size="sm"
                             >
                                 <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                            </Badge>)
-                        }
-
+                            </Badge>
+                        ) : (
+                            <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                        )}
                     </Link>
 
                     {user ? (
@@ -205,19 +211,25 @@ const NavBar = () => {
                     <ul className="flex items-center gap-1">
                         {categories.map((cat) => {
                             const active = isCategoryActive(cat.slug);
+                            const href = cat.slug
+                                ? `/products?category=${cat.slug}`
+                                : "/";
+
                             return (
-                                <li key={cat.slug}>
+                                <li key={cat.slug || "home"}>
                                     <Link
-                                        href={`/products?category=${cat.slug}`}
-                                        className={`group relative inline-block px-4 py-3 font-heading text-sm font-semibold transition-colors duration-200 ${active
-                                            ? "text-primary"
-                                            : "text-foreground hover:text-primary"
-                                            }`}
+                                        href={href}
+                                        className={`group relative inline-block px-4 py-3 font-heading text-sm font-semibold transition-colors duration-200 ${
+                                            active
+                                                ? "text-primary"
+                                                : "text-foreground hover:text-primary"
+                                        }`}
                                     >
                                         {cat.name}
                                         <span
-                                            className={`absolute left-1/2 -translate-x-1/2 bottom-1.5 h-[2px] bg-secondary rounded-full transition-all duration-300 ${active ? "w-8" : "w-0 group-hover:w-8"
-                                                }`}
+                                            className={`absolute left-1/2 -translate-x-1/2 bottom-1.5 h-0.5 bg-secondary rounded-full transition-all duration-300 ${
+                                                active ? "w-8" : "w-0 group-hover:w-8"
+                                            }`}
                                         />
                                     </Link>
                                 </li>
@@ -236,7 +248,7 @@ const NavBar = () => {
                     </ul>
 
                     <Link
-                        href="/categories"
+                        href="/products"
                         className="font-body text-xs text-text-muted hover:text-primary transition flex items-center gap-1"
                     >
                         সব ক্যাটাগরি
@@ -248,7 +260,7 @@ const NavBar = () => {
             {/* ==================== MOBILE: TOP BAR ==================== */}
             <div className="flex md:hidden px-4 py-3 items-center gap-3">
 
-                {/* Logo — compact, no subtitle */}
+                {/* Logo — compact */}
                 <Link href="/" className="shrink-0 flex flex-col mr-5">
                     <span className="font-heading text-lg font-extrabold text-primary tracking-tight">
                         মনোহর
@@ -264,31 +276,32 @@ const NavBar = () => {
                         <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                         <input
                             type="text"
+                            size={1}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             placeholder="খুঁজুন..."
-                            className="w-full pl-9 pr-3 py-2 rounded-full bg-surface border border-border text-foreground placeholder:text-text-muted font-body text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                            className="w-full min-w-0 pl-9 pr-3 py-2 rounded-full bg-surface border border-border text-foreground placeholder:text-text-muted font-body text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
                         />
                     </div>
                 </form>
 
                 {/* Cart */}
                 <Link href="/cart" className="relative shrink-0 ml-5">
-                    {
-                        cartCount > 0 && (<Badge
+                    {cartCount > 0 ? (
+                        <Badge
                             content={cartCount}
                             color="primary"
-
                             shape="circle"
                             size="sm"
                         >
                             <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                        </Badge>)
-                    }
-
+                        </Badge>
+                    ) : (
+                        <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                    )}
                 </Link>
             </div>
-        </nav >
+        </nav>
     );
 };
 
