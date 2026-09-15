@@ -10,6 +10,7 @@ import {
 import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
 import MobileBottomNav from "@/components/shared/MobileBottomNav";
+import Footer from "@/components/shared/Footer";
 
 // বাংলা - Heading
 const tiroBangla = Tiro_Bangla({
@@ -87,6 +88,7 @@ export default function RootLayout({ children }) {
         <main className="pt-17 md:pt-31 pb-18 md:pb-0 overflow-x-hidden w-full">
           {children}
         </main>
+        <Footer/>   
         <MobileBottomNav />
 
       </body>
