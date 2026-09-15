@@ -41,3 +41,30 @@ export async function getProduct(slug) {
         return null;
     }
 }
+
+// lib/api.js — নতুন function যোগ করুন
+export async function getProductsPaginated({
+    page = 1,
+    limit = 12,
+    ...rest
+} = {}) {
+    try {
+        const params = new URLSearchParams();
+        Object.entries(rest).forEach(([k, v]) => {
+            if (v !== undefined && v !== null && v !== "") {
+                params.set(k, String(v));
+            }
+        });
+        params.set("page", String(page));
+        params.set("limit", String(limit));
+
+        const res = await fetch(`${API_URL}/products?${params.toString()}`, {
+            next: { revalidate: 30 },
+        });
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+    } catch (err) {
+        console.error("getProductsPaginated error:", err);
+        return { products: [], total: 0, page: 1, totalPages: 1 };
+    }
+}

@@ -85,27 +85,33 @@ const NavBar = () => {
                 <div className="flex items-center gap-5 shrink-0">
 
                     <Link href="/wishlist" className="relative">
-                        <Badge
-                            content={wishlistCount}
-                            color="primary"
-                            isInvisible={wishlistCount === 0}
-                            shape="circle"
-                            size="sm"
-                        >
-                            <IoHeartOutline className="w-6 h-6 mr-1.5 text-foreground bg-background hover:text-primary transition" />
-                        </Badge>
+                        {
+                            wishlistCount > 0 && (
+                                < Badge
+                                    content={wishlistCount}
+                                    color="primary"
+                                    shape="circle"
+                                    size="sm"
+                                >
+                                    <IoHeartOutline className="w-6 h-6 mr-1.5 text-foreground bg-background hover:text-primary transition" />
+                                </Badge>
+                            )
+                        }
                     </Link>
 
                     <Link href="/cart" className="relative">
-                        <Badge
-                            content={cartCount}
-                            color="primary"
-                            isInvisible={cartCount === 0}
-                            shape="circle"
-                            size="sm"
-                        >
-                            <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                        </Badge>
+                        {
+                            cartCount > 0 && (<Badge
+                                content={cartCount}
+                                color="primary"
+
+                                shape="circle"
+                                size="sm"
+                            >
+                                <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
+                            </Badge>)
+                        }
+
                     </Link>
 
                     {user ? (
@@ -268,18 +274,21 @@ const NavBar = () => {
 
                 {/* Cart */}
                 <Link href="/cart" className="relative shrink-0 ml-5">
-                    <Badge
-                        content={cartCount}
-                        color="primary"
-                        isInvisible={cartCount === 0}
-                        shape="circle"
-                        size="sm"
-                    >
-                        <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                    </Badge>
+                    {
+                        cartCount > 0 && (<Badge
+                            content={cartCount}
+                            color="primary"
+
+                            shape="circle"
+                            size="sm"
+                        >
+                            <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
+                        </Badge>)
+                    }
+
                 </Link>
             </div>
-        </nav>
+        </nav >
     );
 };
 
