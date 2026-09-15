@@ -8,6 +8,8 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
+import NavBar from "@/components/shared/NavBar";
+import MobileBottomNav from "@/components/shared/MobileBottomNav";
 
 // বাংলা - Heading
 const tiroBangla = Tiro_Bangla({
@@ -80,7 +82,14 @@ export default function RootLayout({ children }) {
         ${inter.variable}
         ${marcellus.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col mt-0">
+        <NavBar />
+        <main className="pt-17 md:pt-31 pb-18 md:pb-0">
+          {children}
+        </main>
+        <MobileBottomNav />
+
+      </body>
     </html>
   );
 }
