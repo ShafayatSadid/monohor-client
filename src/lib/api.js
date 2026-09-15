@@ -1,5 +1,5 @@
 // lib/api.js
-const API_URL = process.env.NEXT_PUBLIC_API_UR;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getCategories() {
     try {

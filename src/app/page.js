@@ -7,10 +7,12 @@ export default async function Home() {
 
   const categories = await getCategories();
   return (
-    <div className="flex flex-col flex-1 items-center justify-center mb-20">
+    <div className="mb-20">
       <main>
         <Hero />
-        <CategorySection categories={categories} />
+        <div className="mx-5">
+          <CategorySection categories={categories} />
+        </div>
       </main>
     </div>
   );

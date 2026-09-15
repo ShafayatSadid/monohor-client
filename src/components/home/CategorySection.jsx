@@ -6,9 +6,9 @@ import SectionHeading from "@/components/shared/SectionHeading";
 // Fallback ছবি — যদি backend-এ image না থাকে
 const fallbackImages = {
     attar: "/images/categories/slide-1.webp",
-    bakhur: "/images/categories/slide-1.webp",
-    "hater-kaj": "/images/categories/slide-1.webp",
-    showpiece: "/images/categories/slide-1.webp",
+    bakhur: "/images/categories/slide-2.webp",
+    "hater-kaj": "/images/categories/slide-3.webp",
+    showpiece: "/images/categories/slide-4.webp",
 };
 
 // বাংলা description — backend-এর ইংরেজি description-এর বদলে
@@ -30,7 +30,7 @@ const CategorySection = ({ categories = [] }) => {
                 subtitle="চারটি ক্যাটাগরি থেকে বেছে নিন আপনার পছন্দের পণ্য"
             />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+            <div className=" grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
                 {categories.map((cat) => {
                     const imgSrc =
                         cat.image && cat.image.trim() !== ""
