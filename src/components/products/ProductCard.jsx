@@ -121,15 +121,15 @@ const ProductCard = ({ product }) => {
                 <div className="flex items-baseline gap-2 mb-3">
                     {hasDiscount ? (
                         <>
-                            <span className="font-accent text-base md:text-lg font-bold text-primary">
+                            <span className="font-price text-base md:text-lg font-bold text-primary">
                                 ৳{product.price}
                             </span>
-                            <span className="font-accent text-xs md:text-sm text-text-muted line-through">
+                            <span className="font-price text-xs md:text-sm text-text-muted line-through">
                                 ৳{product.oldPrice}
                             </span>
                         </>
                     ) : (
-                        <span className="font-accent text-base md:text-lg font-bold text-primary">
+                        <span className="font-price text-base md:text-lg font-bold text-primary">
                             ৳{product.price}
                         </span>
                     )}

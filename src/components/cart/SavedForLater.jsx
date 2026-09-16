@@ -68,7 +68,7 @@ const SavedForLater = () => {
                                 {item.name}
                             </Link>
 
-                            <span className="font-accent text-sm font-bold text-primary mb-2">
+                            <span className="font-price text-sm font-bold text-primary mb-2">
                                 ৳{item.price}
                             </span>
 

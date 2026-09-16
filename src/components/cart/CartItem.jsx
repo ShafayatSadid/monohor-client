@@ -81,15 +81,15 @@ const CartItem = ({ item }) => {
                 <div className="flex items-baseline gap-2 mb-2">
                     {item.oldPrice && item.oldPrice > item.price ? (
                         <>
-                            <span className="font-accent text-sm md:text-base font-bold text-primary">
+                            <span className="font-price text-sm md:text-base font-bold text-primary">
                                 ৳{item.price}
                             </span>
-                            <span className="font-accent text-xs text-text-muted line-through">
+                            <span className="font-price text-xs text-text-muted line-through">
                                 ৳{item.oldPrice}
                             </span>
                         </>
                     ) : (
-                        <span className="font-accent text-sm md:text-base font-bold text-primary">
+                        <span className="font-price text-sm md:text-base font-bold text-primary">
                             ৳{item.price}
                         </span>
                     )}
@@ -127,7 +127,7 @@ const CartItem = ({ item }) => {
                     </div>
 
                     {/* Item total */}
-                    <span className="font-accent text-sm md:text-base font-bold text-foreground hidden sm:inline">
+                    <span className="font-price text-sm md:text-base font-bold text-foreground hidden sm:inline">
                         ৳{item.price * item.qty}
                     </span>
 

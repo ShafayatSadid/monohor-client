@@ -117,15 +117,15 @@ const ProductInfo = ({ product }) => {
             </div>
 
             <div className="flex items-baseline gap-3 mb-5 md:mb-6">
-                <span className="font-accent text-2xl md:text-3xl font-extrabold text-primary">
+                <span className="font-price text-2xl md:text-3xl font-extrabold text-primary">
                     ৳{product.price}
                 </span>
                 {hasDiscount && (
                     <>
-                        <span className="font-accent text-base md:text-lg text-text-muted line-through">
+                        <span className="font-price text-base md:text-lg text-text-muted line-through">
                             ৳{product.oldPrice}
                         </span>
-                        <span className="font-accent text-xs md:text-sm font-bold text-error bg-error/10 px-2 py-0.5 rounded-full">
+                        <span className="font-price text-xs md:text-sm font-bold text-error bg-error/10 px-2 py-0.5 rounded-full">
                             -{discountPercent}%
                         </span>
                     </>

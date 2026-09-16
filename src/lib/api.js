@@ -68,3 +68,30 @@ export async function getProductsPaginated({
         return { products: [], total: 0, page: 1, totalPages: 1 };
     }
 }
+
+// lib/api.js — নতুন function
+export async function createOrder(payload) {
+    try {
+        const res = await fetch(`${API_URL}/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            return {
+                ok: false,
+                message: data.message || "অর্ডার জমা হয়নি",
+            };
+        }
+
+        return { ok: true, ...data };
+    } catch (err) {
+        console.error("createOrder error:", err);
+        return { ok: false, message: "নেটওয়ার্ক সমস্যা হয়েছে" };
+    }
+}
+

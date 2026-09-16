@@ -28,7 +28,7 @@ const CartSummary = () => {
                 <span className="font-body text-sm text-text-muted">
                     সাবটোটাল ({totalItems}টি পণ্য)
                 </span>
-                <span className="font-accent text-sm font-bold text-foreground">
+                <span className="font-price text-sm font-bold text-foreground">
                     ৳{subtotal}
                 </span>
             </div>
@@ -49,7 +49,7 @@ const CartSummary = () => {
                     <span className="font-heading text-base md:text-lg font-bold text-foreground">
                         মোট
                     </span>
-                    <span className="font-accent text-xl md:text-2xl font-extrabold text-primary">
+                    <span className="font-price text-xl md:text-2xl font-extrabold text-primary">
                         ৳{subtotal}
                     </span>
                 </div>

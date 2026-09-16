@@ -5,6 +5,7 @@ import {
   Cormorant_Garamond,
   Inter,
   Marcellus,
+  
 } from "next/font/google";
 
 import "./globals.css";
@@ -54,6 +55,8 @@ const marcellus = Marcellus({
   weight: "400",
   variable: "--font-en-accent",
 });
+
+
 
 
 export const metadata = {
