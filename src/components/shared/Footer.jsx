@@ -18,7 +18,7 @@ const Footer = () => {
         { label: "সব পণ্য", href: "/products" },
         { label: "আতর", href: "/products?category=attar" },
         { label: "বাখুর", href: "/products?category=bakhur" },
-        { label: "কুশিটাকার কাজ", href: "/products?category=hater-kaj" },
+        { label: "কুশিটাকার শিল্প", href: "/products?category=hater-kaj" },
         { label: "শোপিস", href: "/products?category=showpiece" },
     ];
 
@@ -54,7 +54,7 @@ const Footer = () => {
                         </Link>
 
                         <p className="font-body text-sm text-background/70 leading-relaxed max-w-md mb-5">
-                            বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিটাকার কাজ ও শোপিসের বিশ্বস্ত ঠিকানা।
+                            বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিটাকার শিল্প ও শোপিসের বিশ্বস্ত ঠিকানা।
                             হাতে তৈরি পণ্য, সারা দেশে ডেলিভারি।
                         </p>
 
@@ -79,7 +79,7 @@ const Footer = () => {
                                     href="mailto:hello@monohor.com"
                                     className="hover:text-secondary transition"
                                 >
-                                    hello@monohor.com
+                                    hello.monohor@gmail.com
                                 </a>
                             </li>
                         </ul>

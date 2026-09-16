@@ -13,11 +13,14 @@ import {
     IoStarHalf,
     IoStarOutline,
 } from "react-icons/io5";
+import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
+import toast from "react-hot-toast";
 
 const categoryNames = {
     attar: "আতর",
     bakhur: "বাখুর",
-    "hater-kaj": "কুশিটাকার কাজ",
+    "hater-kaj": "কুশিটাকার শিল্প",
     showpiece: "শোপিস",
 };
 
@@ -34,17 +37,23 @@ const renderStars = (rating = 0) => {
 
 const ProductInfo = ({ product }) => {
     const [qty, setQty] = useState(1);
-    const [wishlisted, setWishlisted] = useState(false);
+    const [added, setAdded] = useState(false);
+
+    const addItem = useCartStore((s) => s.addItem);
+    const wishlistItems = useWishlistStore((s) => s.items);
+    const toggleWishlist = useWishlistStore((s) => s.toggle);
+
+    const wishlisted = wishlistItems.some((i) => i.slug === product.slug);
 
     const hasDiscount =
         product.oldPrice && Number(product.oldPrice) > Number(product.price);
 
     const discountPercent = hasDiscount
         ? Math.round(
-              ((Number(product.oldPrice) - Number(product.price)) /
-                  Number(product.oldPrice)) *
-                  100
-          )
+            ((Number(product.oldPrice) - Number(product.price)) /
+                Number(product.oldPrice)) *
+            100
+        )
         : 0;
 
     const isOutOfStock = product.stock === 0;
@@ -57,13 +66,34 @@ const ProductInfo = ({ product }) => {
     const dec = () => setQty((q) => Math.max(1, q - 1));
 
     const handleAddToCart = () => {
-        // TODO: Zustand cart store-এ যোগ করবেন
-        console.log("Add to cart:", product.slug, "Qty:", qty);
+        const result = addItem(product, qty);
+
+        if (!result.ok) {
+            toast.error(result.message || "যোগ করা যায়নি", {
+                duration: 3000,
+            });
+            return;
+        }
+
+        toast.success(`${qty}টি ${product.name} কার্টে যোগ হয়েছে`, {
+            duration: 2000,
+        });
+
+        setAdded(true);
+        setTimeout(() => setAdded(false), 2000);
+    };
+    const handleWishlist = () => {
+        const wasAdded = toggleWishlist(product);
+
+        if (wasAdded) {
+            toast.success("উইশলিস্টে যোগ হয়েছে", { duration: 2000 });
+        } else {
+            toast.success("উইশলিস্ট থেকে সরানো হয়েছে", { duration: 2000 });
+        }
     };
 
     return (
         <div className="flex flex-col">
-            {/* Category tag */}
             {product.category && (
                 <Link
                     href={`/products?category=${product.category}`}
@@ -73,12 +103,10 @@ const ProductInfo = ({ product }) => {
                 </Link>
             )}
 
-            {/* Name */}
             <h1 className="font-heading text-2xl md:text-3xl lg:text-4xl font-extrabold text-foreground leading-tight mb-3">
                 {product.name}
             </h1>
 
-            {/* Rating (static placeholder) */}
             <div className="flex items-center gap-2 mb-4 md:mb-5">
                 <div className="flex items-center text-secondary">
                     {renderStars(product.rating || 0)}
@@ -88,7 +116,6 @@ const ProductInfo = ({ product }) => {
                 </span>
             </div>
 
-            {/* Price */}
             <div className="flex items-baseline gap-3 mb-5 md:mb-6">
                 <span className="font-accent text-2xl md:text-3xl font-extrabold text-primary">
                     ৳{product.price}
@@ -105,7 +132,6 @@ const ProductInfo = ({ product }) => {
                 )}
             </div>
 
-            {/* Stock status */}
             <div className="mb-5 md:mb-6">
                 {isOutOfStock ? (
                     <span className="font-body text-sm text-error font-semibold">
@@ -122,7 +148,6 @@ const ProductInfo = ({ product }) => {
                 )}
             </div>
 
-            {/* Description */}
             {product.description && (
                 <div className="mb-5 md:mb-6 pb-5 md:pb-6 border-b border-border">
                     <p className="font-body text-sm md:text-base text-foreground/80 leading-relaxed">
@@ -131,9 +156,7 @@ const ProductInfo = ({ product }) => {
                 </div>
             )}
 
-            {/* Quantity + Add to Cart */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
-                {/* Quantity selector */}
                 <div className="flex items-center justify-between sm:justify-start border border-border rounded-full overflow-hidden bg-surface">
                     <button
                         onClick={dec}
@@ -156,24 +179,30 @@ const ProductInfo = ({ product }) => {
                     </button>
                 </div>
 
-                {/* Add to Cart */}
-                <Button
-                    onClick={handleAddToCart}
-                    isDisabled={isOutOfStock}
-                    className="flex-1 bg-primary hover:bg-primary-hover disabled:bg-border disabled:text-text-muted text-white font-heading font-bold text-sm md:text-base py-3 h-11 rounded-full shadow-sm transition"
-                >
-                    {isOutOfStock ? "স্টক নেই" : "কার্টে যোগ করুন"}
-                </Button>
-
-                {/* Wishlist */}
                 <button
-                    onClick={() => setWishlisted((w) => !w)}
+                    onClick={handleAddToCart}
+                    disabled={isOutOfStock}
+                    className={`flex-1 disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed text-white font-heading font-bold text-sm md:text-base py-3 h-11 rounded-full shadow-sm transition ${added
+                            ? "bg-success"
+                            : isOutOfStock
+                                ? ""
+                                : "bg-primary hover:bg-primary-hover"
+                        }`}
+                >
+                    {isOutOfStock
+                        ? "স্টক নেই"
+                        : added
+                            ? "✓ কার্টে যোগ হয়েছে"
+                            : "কার্টে যোগ করুন"}
+                </button>
+
+                <button
+                    onClick={handleWishlist}
                     aria-label="Toggle wishlist"
-                    className={`w-11 h-11 shrink-0 flex items-center justify-center rounded-full border transition ${
-                        wishlisted
-                            ? "border-error text-error bg-error/10"
-                            : "border-border text-foreground hover:border-error hover:text-error"
-                    }`}
+                    className={`w-11 h-11 shrink-0 flex items-center justify-center rounded-full border transition ${wishlisted
+                        ? "border-error text-error bg-error/10"
+                        : "border-border text-foreground hover:border-error hover:text-error"
+                        }`}
                 >
                     {wishlisted ? (
                         <IoHeart className="w-5 h-5" />
@@ -183,7 +212,6 @@ const ProductInfo = ({ product }) => {
                 </button>
             </div>
 
-            {/* Meta info */}
             <div className="mt-4 pt-4 border-t border-border space-y-1.5">
                 <p className="font-body text-xs text-text-muted">
                     <span className="text-foreground/70">ক্যাটাগরি:</span>{" "}

@@ -8,9 +8,11 @@ import {
     IoCartOutline,
     IoHeartOutline,
 } from "react-icons/io5";
-import { Avatar, Badge, Button, Dropdown, Label } from "@heroui/react";
+import { Avatar, Button, Dropdown, Label } from "@heroui/react";
 import { ArrowRightFromSquare, Persons } from "@gravity-ui/icons";
 import { useRouter, usePathname } from "next/navigation";
+import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -22,9 +24,10 @@ const NavBar = () => {
     const { data: session } = authClient.useSession();
     const user = session?.user;
 
-    // TODO: পরে Zustand cart store থেকে আনবেন
-    const cartCount = 0;
-    const wishlistCount = 0;
+    const cartCount = useCartStore((s) =>
+        s.items.reduce((sum, i) => sum + i.qty, 0)
+    );
+    const wishlistCount = useWishlistStore((s) => s.items.length);
 
     const categories = [
         { slug: "", name: "হোম" },
@@ -89,34 +92,23 @@ const NavBar = () => {
                 {/* Right Actions */}
                 <div className="flex items-center gap-5 shrink-0">
 
+                    {/* Wishlist */}
                     <Link href="/wishlist" className="relative">
+                        <IoHeartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
                         {wishlistCount > 0 && (
-                            <Badge
-                                content={wishlistCount}
-                                color="primary"
-                                shape="circle"
-                                size="sm"
-                            >
-                                <IoHeartOutline className="w-6 h-6 mr-1.5 text-foreground bg-background hover:text-primary transition" />
-                            </Badge>
-                        )}
-                        {wishlistCount === 0 && (
-                            <IoHeartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                            <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                                {wishlistCount}
+                            </span>
                         )}
                     </Link>
 
+                    {/* Cart */}
                     <Link href="/cart" className="relative">
-                        {cartCount > 0 ? (
-                            <Badge
-                                content={cartCount}
-                                color="primary"
-                                shape="circle"
-                                size="sm"
-                            >
-                                <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                            </Badge>
-                        ) : (
-                            <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                        <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                                {cartCount}
+                            </span>
                         )}
                     </Link>
 
@@ -219,17 +211,15 @@ const NavBar = () => {
                                 <li key={cat.slug || "home"}>
                                     <Link
                                         href={href}
-                                        className={`group relative inline-block px-4 py-3 font-heading text-sm font-semibold transition-colors duration-200 ${
-                                            active
+                                        className={`group relative inline-block px-4 py-3 font-heading text-sm font-semibold transition-colors duration-200 ${active
                                                 ? "text-primary"
                                                 : "text-foreground hover:text-primary"
-                                        }`}
+                                            }`}
                                     >
                                         {cat.name}
                                         <span
-                                            className={`absolute left-1/2 -translate-x-1/2 bottom-1.5 h-0.5 bg-secondary rounded-full transition-all duration-300 ${
-                                                active ? "w-8" : "w-0 group-hover:w-8"
-                                            }`}
+                                            className={`absolute left-1/2 -translate-x-1/2 bottom-1.5 h-0.5 bg-secondary rounded-full transition-all duration-300 ${active ? "w-8" : "w-0 group-hover:w-8"
+                                                }`}
                                         />
                                     </Link>
                                 </li>
@@ -242,7 +232,7 @@ const NavBar = () => {
                                 className="group relative inline-block px-4 py-3 font-heading text-sm font-bold text-error transition-colors duration-200 hover:text-primary"
                             >
                                 অফার
-                                <span className="absolute left-1/2 -translate-x-1/2 bottom-1.5 h-[2px] w-0 bg-error rounded-full transition-all duration-300 group-hover:w-8" />
+                                <span className="absolute left-1/2 -translate-x-1/2 bottom-1.5 h-0.5 w-0 bg-error rounded-full transition-all duration-300 group-hover:w-8" />
                             </Link>
                         </li>
                     </ul>
@@ -287,17 +277,11 @@ const NavBar = () => {
 
                 {/* Cart */}
                 <Link href="/cart" className="relative shrink-0 ml-5">
-                    {cartCount > 0 ? (
-                        <Badge
-                            content={cartCount}
-                            color="primary"
-                            shape="circle"
-                            size="sm"
-                        >
-                            <IoCartOutline className="w-6 h-6 text-foreground bg-background hover:text-primary transition" />
-                        </Badge>
-                    ) : (
-                        <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                    <IoCartOutline className="w-6 h-6 text-foreground hover:text-primary transition" />
+                    {cartCount > 0 && (
+                        <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] px-1 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
+                            {cartCount}
+                        </span>
                     )}
                 </Link>
             </div>

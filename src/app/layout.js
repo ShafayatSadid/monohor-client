@@ -11,6 +11,7 @@ import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
 import MobileBottomNav from "@/components/shared/MobileBottomNav";
 import Footer from "@/components/shared/Footer";
+import { Toaster } from "react-hot-toast";
 
 // বাংলা - Heading
 const tiroBangla = Tiro_Bangla({
@@ -84,6 +85,7 @@ export default function RootLayout({ children }) {
         ${marcellus.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col mt-0">
+        <Toaster/>
         <NavBar />
         <main className="pt-17 md:pt-31 pb-18 md:pb-0 overflow-x-hidden w-full">
           {children}

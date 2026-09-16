@@ -28,7 +28,6 @@ const ProductFilters = ({ categories = {} }) => {
                 params.set(k, String(v));
             }
         });
-        // নতুন filter হলে page reset
         params.delete("page");
         router.push(`${pathname}?${params.toString()}`);
     };
@@ -62,7 +61,8 @@ const ProductFilters = ({ categories = {} }) => {
         ...Object.entries(categories).map(([slug, name]) => ({ slug, name })),
     ];
 
-    const FilterForm = () => (
+    // Plain function — component নয়, তাই render-এ call করা ঠিক
+    const renderFilterForm = () => (
         <div className="space-y-6">
             {/* Category */}
             <div>
@@ -131,7 +131,7 @@ const ProductFilters = ({ categories = {} }) => {
         <>
             {/* Desktop sidebar */}
             <aside className="hidden md:block bg-surface/60 border border-border rounded-xl p-5">
-                <FilterForm />
+                {renderFilterForm()}
             </aside>
 
             {/* Mobile: filter button */}
@@ -161,12 +161,10 @@ const ProductFilters = ({ categories = {} }) => {
                         sheetOpen ? "translate-y-0" : "translate-y-full"
                     }`}
                 >
-                    {/* Handle */}
                     <div className="flex justify-center pt-3 pb-1">
                         <span className="w-12 h-1 rounded-full bg-border" />
                     </div>
 
-                    {/* Header */}
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border">
                         <h2 className="font-heading text-lg font-bold text-foreground">
                             ফিল্টার
@@ -179,9 +177,8 @@ const ProductFilters = ({ categories = {} }) => {
                         </button>
                     </div>
 
-                    {/* Content */}
                     <div className="p-5">
-                        <FilterForm />
+                        {renderFilterForm()}
                     </div>
 
                     <div className="h-4" />

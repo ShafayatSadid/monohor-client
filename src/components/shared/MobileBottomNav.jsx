@@ -21,6 +21,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 
 import { authClient } from "@/lib/auth-client";
+import { useCartStore } from "@/store/cartStore";
 
 const MobileBottomNav = () => {
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -31,7 +32,9 @@ const MobileBottomNav = () => {
     const user = session?.user;
 
     // TODO: পরে Zustand থেকে আনবেন
-    const cartCount = 0;
+    const cartCount = useCartStore((s) =>
+        s.items.reduce((sum, i) => sum + i.qty, 0)
+    );
 
     const tabs = [
         { key: "home", label: "হোম", href: "/", icon: IoHomeOutline },
@@ -73,9 +76,8 @@ const MobileBottomNav = () => {
                                 <li key={tab.key}>
                                     <button
                                         onClick={handleAccountClick}
-                                        className={`w-full flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
-                                            active ? "text-primary" : "text-text-muted"
-                                        }`}
+                                        className={`w-full flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${active ? "text-primary" : "text-text-muted"
+                                            }`}
                                     >
                                         <Icon className="w-5 h-5" />
                                         <span className="font-body text-[10px] font-semibold">
@@ -90,9 +92,8 @@ const MobileBottomNav = () => {
                             <li key={tab.key}>
                                 <Link
                                     href={tab.href}
-                                    className={`flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
-                                        active ? "text-primary" : "text-text-muted"
-                                    }`}
+                                    className={`flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${active ? "text-primary" : "text-text-muted"
+                                        }`}
                                 >
                                     <span className="relative">
                                         <Icon className="w-5 h-5" />
@@ -115,9 +116,8 @@ const MobileBottomNav = () => {
             {/* ==================== ACCOUNT BOTTOM SHEET ==================== */}
             <div
                 onClick={() => setSheetOpen(false)}
-                className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
-                    sheetOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
+                className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${sheetOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                    }`}
             >
                 {/* Backdrop */}
                 <div className="absolute inset-0 bg-black/50" />
@@ -125,9 +125,8 @@ const MobileBottomNav = () => {
                 {/* Sheet */}
                 <div
                     onClick={(e) => e.stopPropagation()}
-                    className={`absolute bottom-0 left-0 right-0 bg-surface rounded-t-3xl border-t border-border shadow-2xl transition-transform duration-300 ease-out ${
-                        sheetOpen ? "translate-y-0" : "translate-y-full"
-                    }`}
+                    className={`absolute bottom-0 left-0 right-0 bg-surface rounded-t-3xl border-t border-border shadow-2xl transition-transform duration-300 ease-out ${sheetOpen ? "translate-y-0" : "translate-y-full"
+                        }`}
                 >
                     {/* Drag Handle */}
                     <div className="flex justify-center pt-3 pb-1">
