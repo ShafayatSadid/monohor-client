@@ -102,7 +102,7 @@ const AdminSidebar = ({ mobileOpen, onClose }) => {
     return (
         <>
             {/* Desktop sidebar — sticky below navbar */}
-            <aside className="hidden md:flex flex-col w-60 shrink-0 bg-surface border-r border-border sticky top-[124px] h-[calc(100vh-124px)]">
+            <aside className="hidden md:flex flex-col w-60 shrink-0 bg-surface border-r border-border">
                 {sidebarContent}
             </aside>
 
