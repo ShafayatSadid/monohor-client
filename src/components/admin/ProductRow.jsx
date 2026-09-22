@@ -61,7 +61,7 @@ const ProductRow = ({ product, onDelete }) => {
             {/* Actions */}
             <div className="flex items-center gap-1 md:gap-2 justify-end">
                 <Link
-                    href={`/admin/products/${product._id}/edit`}
+                    href={`/admin/products/${product.slug}/edit`}
                     className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-md md:rounded-lg border border-border text-foreground hover:border-primary hover:text-primary transition"
                     aria-label="Edit"
                 >

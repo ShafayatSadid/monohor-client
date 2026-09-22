@@ -147,14 +147,14 @@ console.log('user:', user);
                                     <Dropdown.Item id="orders" textValue="Orders" href="/orders">
                                         <div className="flex items-center gap-3">
                                             <Persons className="size-4 text-text-muted" />
-                                            <Label className="text-foreground">আমার অর্ডার</Label>
+                                            <Label className="text-text-muted">আমার অর্ডার</Label>
                                         </div>
                                     </Dropdown.Item>
 
                                     <Dropdown.Item id="wishlist" textValue="Wishlist" href="/wishlist">
                                         <div className="flex items-center gap-3">
                                             <Persons className="size-4 text-text-muted" />
-                                            <Label className="text-foreground">উইশলিস্ট</Label>
+                                            <Label className="text-text-muted">উইশলিস্ট</Label>
                                         </div>
                                     </Dropdown.Item>
 
@@ -162,7 +162,7 @@ console.log('user:', user);
                                         <Dropdown.Item id="admin" textValue="Admin" href="/admin">
                                             <div className="flex items-center gap-3">
                                                 <Persons className="size-4 text-text-muted" />
-                                                <Label className="text-foreground">অ্যাডমিন প্যানেল</Label>
+                                                <Label className="text-text-muted">অ্যাডমিন প্যানেল</Label>
                                             </div>
                                         </Dropdown.Item>
                                     )}

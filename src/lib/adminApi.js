@@ -41,3 +41,22 @@ export async function adminFetch(path, options = {}) {
 export async function deleteProduct(id) {
     return adminFetch(`/products/${id}`, { method: "DELETE" });
 }
+
+// lib/adminApi.js — নতুন function যোগ করুন
+export async function createProduct(payload) {
+    return adminFetch("/products", {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function updateProduct(id, payload) {
+    return adminFetch(`/products/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function getProductBySlug(slug) {
+    return adminFetch(`/products/${slug}`);
+}

@@ -38,7 +38,7 @@ const MobileBottomNav = () => {
 
     const tabs = [
         { key: "home", label: "হোম", href: "/", icon: IoHomeOutline },
-        { key: "categories", label: "ক্যাটাগরি", href: "/categories", icon: IoGridOutline },
+        { key: "categories", label: "ক্যাটাগরি", href: "/products", icon: IoGridOutline },
         { key: "cart", label: "কার্ট", href: "/cart", icon: IoCartOutline, badge: cartCount },
         { key: "account", label: "অ্যাকাউন্ট", icon: Person, isSheet: true },
     ];
