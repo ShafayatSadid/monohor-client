@@ -23,7 +23,7 @@ const NavBar = () => {
 
     const { data: session } = authClient.useSession();
     const user = session?.user;
-
+console.log('user:', user);
     const cartCount = useCartStore((s) =>
         s.items.reduce((sum, i) => sum + i.qty, 0)
     );

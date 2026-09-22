@@ -15,8 +15,12 @@ export default function AdminLayout({ children }) {
     const user = session?.user;
 
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [checked, setChecked] = useState(false);
 
+    // Derive the check state directly from the session
+    const isChecking = isPending;
+    const isAuthorized = !isPending && user && user.role === "admin";
+
+    // Effect only handles the *side effect* of redirecting, not setting state
     useEffect(() => {
         if (isPending) return;
 
@@ -29,13 +33,11 @@ export default function AdminLayout({ children }) {
         if (user.role !== "admin") {
             toast.error("আপনার অ্যাডমিন অ্যাক্সেস নেই");
             router.replace("/");
-            return;
         }
-
-        setChecked(true);
     }, [isPending, user, router]);
 
-    if (isPending || !checked) {
+    // If still checking, show loader
+    if (isChecking) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="font-body text-text-muted">
@@ -43,6 +45,11 @@ export default function AdminLayout({ children }) {
                 </div>
             </div>
         );
+    }
+
+    // If not authorized, render nothing (the effect will redirect)
+    if (!isAuthorized) {
+        return null;
     }
 
     return (

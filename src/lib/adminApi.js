@@ -35,3 +35,9 @@ export async function adminFetch(path, options = {}) {
         return { ok: false, data: { message: "Network error" } };
     }
 }
+
+
+// lib/adminApi.js — নতুন function যোগ
+export async function deleteProduct(id) {
+    return adminFetch(`/products/${id}`, { method: "DELETE" });
+}

@@ -18,7 +18,10 @@ const AdminHeader = ({ onMenuClick }) => {
 
     let title = titles[pathname];
     if (!title) {
-        if (pathname.startsWith("/admin/products/") && pathname.endsWith("/edit")) {
+        if (
+            pathname.startsWith("/admin/products/") &&
+            pathname.endsWith("/edit")
+        ) {
             title = "পণ্য সম্পাদনা";
         } else if (pathname.startsWith("/admin/orders/")) {
             title = "অর্ডার বিবরণ";
@@ -28,7 +31,7 @@ const AdminHeader = ({ onMenuClick }) => {
     }
 
     return (
-        <header className="sticky top-[64px] md:top-[124px] z-30 bg-background/95 backdrop-blur-md border-b border-border px-4 md:px-6 py-3 flex items-center gap-3">
+        <header className="bg-background border-b border-border px-4 md:px-6 py-3 flex items-center gap-3">
             <button
                 onClick={onMenuClick}
                 className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-foreground hover:bg-surface transition"
