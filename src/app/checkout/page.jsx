@@ -12,108 +12,89 @@ import { useCartStore } from "@/store/cartStore";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 
-const ZONE_CHARGES = {
-    "inside-dhaka": 70,
-    "dhaka-suburban": 100,
-    "outside-dhaka": 130,
-};
+const DELIVERY_CHARGE = 135;
 
 export default function CheckoutPage() {
     const router = useRouter();
     const items = useCartStore((s) => s.items);
     const clearCart = useCartStore((s) => s.clearCart);
 
-    const [mounted, setMounted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const [deliveryZone, setDeliveryZone] = useState("inside-dhaka");
     const [errors, setErrors] = useState({});
 
-    const deliveryCharge = ZONE_CHARGES[deliveryZone] || 70;
-
+    // Empty cart → cart page
     useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (mounted && items.length === 0) {
+        if (items.length === 0) {
             router.replace("/cart");
         }
-    }, [mounted, items.length, router]);
+    }, [items.length, router]);
 
     const handleSubmit = async (e, extras) => {
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries());
 
-    // HeroUI Select/Radio-র value FormData-তে না এলে manual override
-    data.division = extras.division;
-    data.district = extras.district;
-    data.deliveryZone = deliveryZone;
-    data.paymentMethod = extras.paymentMethod;
+        data.division = extras.division;
+        data.district = extras.district;
+        data.paymentMethod = extras.paymentMethod;
 
-    // State-based field validation (Select/Radio)
-    const errs = {};
-    if (!data.division) errs.division = "বিভাগ নির্বাচন করুন";
-    if (!data.district) errs.district = "জেলা নির্বাচন করুন";
-    if (!data.deliveryZone)
-        errs.deliveryZone = "ডেলিভারি জোন নির্বাচন করুন";
+        const errs = {};
+        if (!data.division) errs.division = "বিভাগ নির্বাচন করুন";
+        if (!data.district) errs.district = "জেলা নির্বাচন করুন";
 
-    if (Object.keys(errs).length > 0) {
-        setErrors(errs);
-        toast.error("ফর্মে কিছু ভুল আছে");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
-    }
-
-    setErrors({});
-    setSubmitting(true);
-
-    try {
-        const payload = {
-            items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
-            customer: {
-                name: data.name.trim(),
-                phone: data.phone.trim(),
-                email: data.email?.trim() || null,
-                whatsapp: data.whatsapp?.trim() || null,
-                address: {
-                    division: data.division,
-                    district: data.district,
-                    area: data.area.trim(),
-                    fullAddress: data.fullAddress.trim(),
-                    deliveryZone: data.deliveryZone,
-                },
-            },
-            paymentMethod: data.paymentMethod || "COD",
-            note: data.note?.trim() || "",
-        };
-
-        const result = await createOrder(payload);
-
-        if (!result.ok) {
-            toast.error(result.message || "অর্ডার জমা হয়নি");
-            setSubmitting(false);
+        if (Object.keys(errs).length > 0) {
+            setErrors(errs);
+            toast.error("ফর্মে কিছু ভুল আছে");
+            window.scrollTo({ top: 0, behavior: "smooth" });
             return;
         }
 
-        clearCart();
-        toast.success("অর্ডার সফলভাবে জমা হয়েছে!");
-        router.push(`/order-success?order=${result.orderNumber}`);
-    } catch (err) {
-        console.error(err);
-        toast.error("কিছু ভুল হয়েছে");
-        setSubmitting(false);
-    }
-};
+        setErrors({});
+        setSubmitting(true);
 
-    if (!mounted) {
+        try {
+            const payload = {
+                items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
+                customer: {
+                    name: data.name.trim(),
+                    phone: data.phone.trim(),
+                    email: data.email?.trim() || null,
+                    whatsapp: data.whatsapp?.trim() || null,
+                    address: {
+                        division: data.division,
+                        district: data.district,
+                        area: data.area.trim(),
+                        fullAddress: data.fullAddress.trim(),
+                    },
+                },
+                paymentMethod: data.paymentMethod || "COD",
+                note: data.note?.trim() || "",
+            };
+
+            const result = await createOrder(payload);
+
+            if (!result.ok) {
+                toast.error(result.message || "অর্ডার জমা হয়নি");
+                setSubmitting(false);
+                return;
+            }
+
+            clearCart();
+            toast.success("অর্ডার সফলভাবে জমা হয়েছে!");
+            router.push(`/order-success?order=${result.orderNumber}`);
+        } catch (err) {
+            console.error(err);
+            toast.error("কিছু ভুল হয়েছে");
+            setSubmitting(false);
+        }
+    };
+
+    if (items.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-5 md:px-10 py-10">
                 <div className="h-96 bg-surface/50 rounded-xl animate-pulse" />
             </div>
         );
     }
-
-    if (items.length === 0) return null;
 
     return (
         <div className="max-w-7xl mx-auto px-5 md:px-10 py-6 md:py-10">
@@ -142,13 +123,11 @@ export default function CheckoutPage() {
                 <CheckoutForm
                     onSubmit={handleSubmit}
                     submitting={submitting}
-                    deliveryZone={deliveryZone}
-                    setDeliveryZone={setDeliveryZone}
                     errors={errors}
                 />
                 <OrderSummary
                     formId="checkout-form"
-                    deliveryCharge={deliveryCharge}
+                    deliveryCharge={DELIVERY_CHARGE}
                     submitting={submitting}
                 />
             </div>

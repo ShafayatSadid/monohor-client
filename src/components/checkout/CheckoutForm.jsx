@@ -11,16 +11,8 @@ import {
     FieldError,
     Select,
     ListBox,
-    RadioGroup,
-    Radio,
 } from "@heroui/react";
 import { divisions } from "@/lib/bd-locations";
-
-const DELIVERY_ZONES = [
-    { value: "inside-dhaka", label: "ঢাকার ভিতরে", charge: 70 },
-    { value: "dhaka-suburban", label: "ঢাকার উপশহর", charge: 100 },
-    { value: "outside-dhaka", label: "ঢাকার বাইরে", charge: 130 },
-];
 
 const Section = ({ title, children }) => (
     <section className="bg-surface/50 border border-border rounded-xl p-5 md:p-6">
@@ -31,13 +23,7 @@ const Section = ({ title, children }) => (
     </section>
 );
 
-const CheckoutForm = ({
-    onSubmit,
-    submitting,
-    deliveryZone,
-    setDeliveryZone,
-    errors,
-}) => {
+const CheckoutForm = ({ onSubmit, submitting, errors }) => {
     const [division, setDivision] = useState("");
     const [district, setDistrict] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("COD");
@@ -289,61 +275,45 @@ const CheckoutForm = ({
                 </div>
             </Section>
 
-            {/* ─────────── ডেলিভারি জোন ─────────── */}
-            <Section title="ডেলিভারি জোন">
-                <RadioGroup
-                    value={deliveryZone}
-                    onValueChange={setDeliveryZone}
-                    className="gap-3"
-                >
-                    {DELIVERY_ZONES.map((zone) => (
-                        <Radio
-                            key={zone.value}
-                            value={zone.value}
-                            className={`w-full max-w-full m-0 p-4 rounded-lg border transition cursor-pointer ${
-                                deliveryZone === zone.value
-                                    ? "border-primary bg-primary/5"
-                                    : "border-border hover:border-secondary/60 bg-surface"
-                            }`}
-                        >
-                            <div className="flex items-center justify-between w-full gap-4">
-                                <span className="font-body text-sm font-semibold text-foreground">
-                                    {zone.label}
-                                </span>
-                                <span className="font-price text-sm font-bold text-primary">
-                                    ৳{zone.charge}
-                                </span>
-                            </div>
-                        </Radio>
-                    ))}
-                </RadioGroup>
-                {errors.deliveryZone && (
-                    <p className="text-xs text-error mt-2">
-                        {errors.deliveryZone}
+            {/* ─────────── ডেলিভারি চার্জ তথ্য ─────────── */}
+            <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4 flex items-start gap-3">
+                <span className="text-secondary text-lg shrink-0">ℹ️</span>
+                <div>
+                    <p className="font-heading text-sm font-semibold text-foreground">
+                        ডেলিভারি চার্জ: ৳১৩৫
                     </p>
-                )}
-            </Section>
+                    <p className="font-body text-xs text-text-muted mt-0.5">
+                        সারা বাংলাদেশে একই ডেলিভারি চার্জ প্রযোজ্য
+                    </p>
+                </div>
+            </div>
 
-            {/* ─────────── পেমেন্ট ─────────── */}
+            {/* ─────────── পেমেন্ট পদ্ধতি ─────────── */}
             <Section title="পেমেন্ট পদ্ধতি">
-                <RadioGroup
-                    value={paymentMethod}
-                    onValueChange={setPaymentMethod}
+                <label
+                    className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition ${
+                        paymentMethod === "COD"
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-surface"
+                    }`}
                 >
-                    <Radio
+                    <input
+                        type="radio"
+                        name="paymentMethod"
                         value="COD"
-                        className="w-full max-w-full p-4 rounded-lg border border-border bg-surface cursor-pointer"
-                    >
-                        <div>
-                            <p className="font-body text-sm font-semibold text-foreground">
-                                ক্যাশ অন ডেলিভারি
-                            </p>
-                            <p className="font-body text-xs text-text-muted">
-                                পণ্য হাতে পেয়ে টাকা পরিশোধ করুন
-                            </p>
-                        </div>
-                    </Radio>
-                </RadioGroup>
+                        checked={paymentMethod === "COD"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="w-4 h-4 mt-0.5 accent-[var(--primary)]"
+                    />
+                    <div>
+                        <p className="font-body text-sm font-semibold text-foreground">
+                            ক্যাশ অন ডেলিভারি
+                        </p>
+                        <p className="font-body text-xs text-text-muted">
+                            পণ্য হাতে পেয়ে টাকা পরিশোধ করুন
+                        </p>
+                    </div>
+                </label>
             </Section>
 
             {/* ─────────── নোট ─────────── */}
