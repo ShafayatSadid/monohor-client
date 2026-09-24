@@ -23,7 +23,7 @@
   --font-heading: var(--font-en-heading), var(--font-bn-heading), serif;
   --font-body: var(--font-en-body), var(--font-bn-body), sans-serif;
   --font-accent: var(--font-en-accent), var(--font-bn-accent), sans-serif;
-  --font-price: var(--font-en-body), var(--font-bn-body), sans-serif;
+  --font-price: var(--font-en-heading), var(--font-bn-heading), serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -198,7 +198,7 @@ export default function ContactPage() {
                                 <span className="text-text-muted">
                                     শনিবার - বৃহস্পতিবার
                                 </span>
-                                <span className="font-semibold text-foreground">
+                                <span className="font-semibold text-foreground font-price">
                                     সকাল ১০টা - রাত ৮টা
                                 </span>
                             </li>
@@ -288,7 +288,7 @@ export default function ContactPage() {
                                     <IoChevronDown className="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" />
                                 </summary>
                                 <div className="px-5 pb-4 pt-1 border-t border-border">
-                                    <p className="font-body text-sm text-text-muted leading-relaxed pt-3">
+                                    <p className="font-price text-sm text-text-muted leading-relaxed pt-3">
                                         {faq.a}
                                     </p>
                                 </div>
