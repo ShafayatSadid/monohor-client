@@ -46,9 +46,8 @@ const OrderSummary = ({ formId, deliveryCharge, submitting }) => {
 
             {/* Items */}
             <div
-                className={`space-y-3 pb-4 mb-4 border-b border-border max-h-[280px] overflow-y-auto ${
-                    expanded ? "block" : "hidden md:block"
-                }`}
+                className={`space-y-3 pb-4 mb-4 border-b border-border max-h-[280px] overflow-y-auto ${expanded ? "block" : "hidden md:block"
+                    }`}
             >
                 {items.map((item) => (
                     <div key={item.slug} className="flex gap-3">
@@ -65,6 +64,11 @@ const OrderSummary = ({ formId, deliveryCharge, submitting }) => {
                             <p className="font-body text-xs text-foreground line-clamp-1 mb-0.5">
                                 {item.name}
                             </p>
+                            {item.variantLabel && (
+                                <p className="font-body text-[10px] text-text-muted mb-0.5">
+                                    {item.variantLabel}
+                                </p>
+                            )}
                             <p className="font-body text-[11px] text-text-muted">
                                 ৳{item.price} × {item.qty}
                             </p>
@@ -78,9 +82,8 @@ const OrderSummary = ({ formId, deliveryCharge, submitting }) => {
 
             {/* Totals */}
             <div
-                className={`space-y-2.5 mb-4 ${
-                    expanded ? "block" : "hidden md:block"
-                }`}
+                className={`space-y-2.5 mb-4 ${expanded ? "block" : "hidden md:block"
+                    }`}
             >
                 <div className="flex items-center justify-between">
                     <span className="font-body text-sm text-text-muted">

@@ -1,9 +1,10 @@
 // components/products/ProductInfo.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
+import toast from "react-hot-toast";
 import {
     IoHeartOutline,
     IoHeart,
@@ -15,7 +16,6 @@ import {
 } from "react-icons/io5";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
-import toast from "react-hot-toast";
 
 const categoryNames = {
     attar: "আতর",
@@ -45,15 +45,39 @@ const ProductInfo = ({ product }) => {
 
     const wishlisted = wishlistItems.some((i) => i.slug === product.slug);
 
+    // ─── Variants ───
+    const variants =
+        Array.isArray(product.variants) && product.variants.length > 0
+            ? product.variants
+            : null;
+    const hasVariants = !!variants;
+
+    const [selectedVariantId, setSelectedVariantId] = useState(
+        hasVariants ? variants[0].id : null
+    );
+
+    const selectedVariant = hasVariants
+        ? variants.find((v) => v.id === selectedVariantId) || variants[0]
+        : null;
+
+    // Current effective price / old price
+    const currentPrice = hasVariants
+        ? Number(selectedVariant.price)
+        : Number(product.price);
+
+    const currentOldPrice = hasVariants
+        ? selectedVariant.oldPrice
+        : product.oldPrice;
+
     const hasDiscount =
-        product.oldPrice && Number(product.oldPrice) > Number(product.price);
+        currentOldPrice && Number(currentOldPrice) > currentPrice;
 
     const discountPercent = hasDiscount
         ? Math.round(
-            ((Number(product.oldPrice) - Number(product.price)) /
-                Number(product.oldPrice)) *
-            100
-        )
+              ((Number(currentOldPrice) - currentPrice) /
+                  Number(currentOldPrice)) *
+                  100
+          )
         : 0;
 
     const isOutOfStock = product.stock === 0;
@@ -65,8 +89,18 @@ const ProductInfo = ({ product }) => {
     const inc = () => setQty((q) => Math.min(q + 1, product.stock || 1));
     const dec = () => setQty((q) => Math.max(1, q - 1));
 
+    // Reset qty when variant changes
+    useEffect(() => {
+        setQty(1);
+    }, [selectedVariantId]);
+
     const handleAddToCart = () => {
-        const result = addItem(product, qty);
+        if (hasVariants && !selectedVariant) {
+            toast.error("সাইজ নির্বাচন করুন");
+            return;
+        }
+
+        const result = addItem(product, qty, selectedVariant);
 
         if (!result.ok) {
             toast.error(result.message || "যোগ করা যায়নি", {
@@ -75,21 +109,26 @@ const ProductInfo = ({ product }) => {
             return;
         }
 
-        toast.success(`${qty}টি ${product.name} কার্টে যোগ হয়েছে`, {
-            duration: 2000,
-        });
+        const variantText = hasVariants
+            ? ` (${selectedVariant.label})`
+            : "";
+        toast.success(
+            `${qty}টি "${product.name}"${variantText} কার্টে যোগ হয়েছে`,
+            { duration: 2200 }
+        );
 
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };
+
     const handleWishlist = () => {
         const wasAdded = toggleWishlist(product);
-
-        if (wasAdded) {
-            toast.success("উইশলিস্টে যোগ হয়েছে", { duration: 2000 });
-        } else {
-            toast.success("উইশলিস্ট থেকে সরানো হয়েছে", { duration: 2000 });
-        }
+        toast.success(
+            wasAdded
+                ? "উইশলিস্টে যোগ হয়েছে"
+                : "উইশলিস্ট থেকে সরানো হয়েছে",
+            { duration: 2000 }
+        );
     };
 
     return (
@@ -116,14 +155,45 @@ const ProductInfo = ({ product }) => {
                 </span>
             </div>
 
+            {/* ─── Variant Selector ─── */}
+            {hasVariants && (
+                <div className="mb-5 md:mb-6">
+                    <p className="font-body text-sm font-semibold text-foreground mb-3">
+                        সাইজ নির্বাচন করুন
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                        {variants.map((v) => {
+                            const active = v.id === selectedVariantId;
+                            return (
+                                <button
+                                    key={v.id}
+                                    type="button"
+                                    onClick={() =>
+                                        setSelectedVariantId(v.id)
+                                    }
+                                    className={`px-4 py-2 rounded-full border font-body text-sm font-semibold transition ${
+                                        active
+                                            ? "bg-primary text-white border-primary"
+                                            : "bg-surface border-border text-foreground hover:border-primary"
+                                    }`}
+                                >
+                                    {v.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* ─── Price (live) ─── */}
             <div className="flex items-baseline gap-3 mb-5 md:mb-6">
                 <span className="font-price text-2xl md:text-3xl font-extrabold text-primary">
-                    ৳{product.price}
+                    ৳{currentPrice}
                 </span>
                 {hasDiscount && (
                     <>
                         <span className="font-price text-base md:text-lg text-text-muted line-through">
-                            ৳{product.oldPrice}
+                            ৳{currentOldPrice}
                         </span>
                         <span className="font-price text-xs md:text-sm font-bold text-error bg-error/10 px-2 py-0.5 rounded-full">
                             -{discountPercent}%
@@ -179,30 +249,30 @@ const ProductInfo = ({ product }) => {
                     </button>
                 </div>
 
-                <button
+                <Button
                     onClick={handleAddToCart}
-                    disabled={isOutOfStock}
-                    className={`flex-1 disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed text-white font-heading font-bold text-sm md:text-base py-3 h-11 rounded-full shadow-sm transition ${added
+                    isDisabled={isOutOfStock}
+                    className={`flex-1 disabled:bg-border disabled:text-text-muted text-white font-heading font-bold text-sm md:text-base py-3 h-11 rounded-full shadow-sm transition ${
+                        added
                             ? "bg-success"
-                            : isOutOfStock
-                                ? ""
-                                : "bg-primary hover:bg-primary-hover"
-                        }`}
+                            : "bg-primary hover:bg-primary-hover"
+                    }`}
                 >
                     {isOutOfStock
                         ? "স্টক নেই"
                         : added
-                            ? "✓ কার্টে যোগ হয়েছে"
-                            : "কার্টে যোগ করুন"}
-                </button>
+                        ? "✓ কার্টে যোগ হয়েছে"
+                        : "কার্টে যোগ করুন"}
+                </Button>
 
                 <button
                     onClick={handleWishlist}
                     aria-label="Toggle wishlist"
-                    className={`w-11 h-11 shrink-0 flex items-center justify-center rounded-full border transition ${wishlisted
-                        ? "border-error text-error bg-error/10"
-                        : "border-border text-foreground hover:border-error hover:text-error"
-                        }`}
+                    className={`w-11 h-11 shrink-0 flex items-center justify-center rounded-full border transition ${
+                        wishlisted
+                            ? "border-error text-error bg-error/10"
+                            : "border-border text-foreground hover:border-error hover:text-error"
+                    }`}
                 >
                     {wishlisted ? (
                         <IoHeart className="w-5 h-5" />

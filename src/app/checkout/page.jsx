@@ -53,7 +53,11 @@ export default function CheckoutPage() {
 
         try {
             const payload = {
-                items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
+                items: items.map((i) => ({
+                    slug: i.slug,
+                    variantId: i.variantId || null,
+                    qty: i.qty,
+                })),
                 customer: {
                     name: data.name.trim(),
                     phone: data.phone.trim(),

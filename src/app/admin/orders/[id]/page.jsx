@@ -142,8 +142,23 @@ export default function AdminOrderDetailPage() {
             setStatus(order.orderStatus);
             return;
         }
+
         setOrder(data.order);
-        toast.success("স্ট্যাটাস আপডেট হয়েছে");
+
+        // ─── Email result feedback ───
+        const emailResult = data.emailResult;
+
+        if (emailResult?.ok) {
+            toast.success("স্ট্যাটাস আপডেট + কনফার্মেশন ইমেইল পাঠানো হয়েছে");
+        } else if (emailResult?.message === "গ্রাহকের ইমেইল নেই") {
+            toast.success("স্ট্যাটাস আপডেট হয়েছে (ইমেইল পাঠানো হয়নি — গ্রাহকের ইমেইল নেই)");
+        } else if (emailResult && !emailResult.ok) {
+            toast.error(
+                `স্ট্যাটাস আপডেট হয়েছে কিন্তু ইমেইল পাঠানো যায়নি: ${emailResult.message}`
+            );
+        } else {
+            toast.success("স্ট্যাটাস আপডেট হয়েছে");
+        }
     };
 
     // ─── Update payment ───

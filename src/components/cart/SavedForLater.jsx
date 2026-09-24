@@ -19,12 +19,12 @@ const SavedForLater = () => {
             toast.error("এই পণ্যটি এখন স্টকে নেই", { duration: 2500 });
             return;
         }
-        moveToCart(item.slug);
+        moveToCart(item.key);
         toast.success("কার্টে ফিরিয়ে আনা হয়েছে", { duration: 2000 });
     };
 
-    const handleRemove = (slug) => {
-        removeSaved(slug);
+    const handleRemove = (key) => {
+        removeSaved(key);
         toast.success("তালিকা থেকে সরানো হয়েছে", { duration: 2000 });
     };
 
@@ -42,10 +42,9 @@ const SavedForLater = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {savedItems.map((item) => (
                     <div
-                        key={item.slug}
+                        key={item.key}
                         className="flex gap-3 p-3 bg-surface border border-border rounded-xl"
                     >
-                        {/* Image */}
                         <Link
                             href={`/products/${item.slug}`}
                             className="relative w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-lg overflow-hidden border border-border"
@@ -59,16 +58,21 @@ const SavedForLater = () => {
                             />
                         </Link>
 
-                        {/* Info */}
                         <div className="flex-1 min-w-0 flex flex-col">
                             <Link
                                 href={`/products/${item.slug}`}
-                                className="font-heading text-sm font-bold text-foreground leading-snug line-clamp-2 hover:text-primary transition mb-1"
+                                className="font-heading text-sm font-bold text-foreground leading-snug line-clamp-2 hover:text-primary transition mb-0.5"
                             >
                                 {item.name}
                             </Link>
 
-                            <span className="font-price text-sm font-bold text-primary mb-2">
+                            {item.variantLabel && (
+                                <p className="font-body text-[11px] text-text-muted mb-1">
+                                    সাইজ: {item.variantLabel}
+                                </p>
+                            )}
+
+                            <span className="font-accent text-sm font-bold text-primary mb-2">
                                 ৳{item.price}
                             </span>
 
@@ -83,7 +87,7 @@ const SavedForLater = () => {
                                 </button>
 
                                 <button
-                                    onClick={() => handleRemove(item.slug)}
+                                    onClick={() => handleRemove(item.key)}
                                     aria-label="Remove"
                                     className="ml-auto w-6 h-6 flex items-center justify-center rounded-full text-text-muted hover:bg-error/10 hover:text-error transition"
                                 >

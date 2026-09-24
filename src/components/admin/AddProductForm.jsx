@@ -16,7 +16,7 @@ import {
     ListBox,
     Button,
 } from "@heroui/react";
-import { IoArrowBack } from "react-icons/io5";
+import { IoArrowBack, IoAdd, IoTrashOutline } from "react-icons/io5";
 
 import { createProduct } from "@/lib/adminApi";
 import ProductImageUploader from "./ProductImageUploader";
@@ -43,6 +43,8 @@ const INITIAL_FORM = {
     newArrival: true,
     bestSeller: false,
     images: [],
+    variantsEnabled: false,
+    variants: [],
 };
 
 const slugify = (text) =>
@@ -84,7 +86,6 @@ const AddProductForm = () => {
 
         const newSlug = shouldAutoUpdate ? slugify(name) : formData.slug;
 
-        // Uncontrolled input-এ সরাসরি ref দিয়ে value বসাই
         if (shouldAutoUpdate && slugRef.current) {
             slugRef.current.value = newSlug;
         }
@@ -100,6 +101,54 @@ const AddProductForm = () => {
         updateField("slug", slugify(e.target.value));
     };
 
+    // ─── Variant helpers ───
+    const addVariant = () => {
+        setFormData((prev) => ({
+            ...prev,
+            variants: [
+                ...prev.variants,
+                {
+                    id: `v${Date.now()}`,
+                    size: "",
+                    label: "",
+                    price: "",
+                    oldPrice: "",
+                },
+            ],
+        }));
+    };
+
+    const updateVariant = (id, field, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            variants: prev.variants.map((v) =>
+                v.id === id ? { ...v, [field]: value } : v
+            ),
+        }));
+    };
+
+    const removeVariant = (id) => {
+        setFormData((prev) => ({
+            ...prev,
+            variants: prev.variants.filter((v) => v.id !== id),
+        }));
+    };
+
+    // ─── Category change handler ───
+    const handleCategoryChange = (value) => {
+        const cat = value ? String(value) : "";
+        setFormData((prev) => ({
+            ...prev,
+            category: cat,
+            // Category attar না হলে variants disable করে দিই
+            ...(cat !== "attar"
+                ? { variantsEnabled: false, variants: [] }
+                : {}),
+        }));
+    };
+
+    const showVariantsSection = formData.category === "attar";
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -113,12 +162,51 @@ const AddProductForm = () => {
             return;
         }
 
+        // ─── Variant validation ───
+        let finalVariants = [];
+        if (showVariantsSection && formData.variantsEnabled) {
+            if (formData.variants.length === 0) {
+                toast.error("কমপক্ষে ১টি ভ্যারিয়েন্ট যোগ করুন");
+                return;
+            }
+            for (let i = 0; i < formData.variants.length; i++) {
+                const v = formData.variants[i];
+                if (!v.size || !v.size.trim()) {
+                    toast.error(`ভ্যারিয়েন্ট ${i + 1}: সাইজ লিখুন`);
+                    return;
+                }
+                if (v.price === "" || isNaN(Number(v.price))) {
+                    toast.error(`ভ্যারিয়েন্ট ${i + 1}: সঠিক দাম দিন`);
+                    return;
+                }
+            }
+            finalVariants = formData.variants.map((v) => {
+                const out = {
+                    id: v.id,
+                    size: v.size.trim(),
+                    label: (v.label || v.size).trim(),
+                    price: Number(v.price),
+                };
+                if (v.oldPrice && v.oldPrice !== "") {
+                    out.oldPrice = Number(v.oldPrice);
+                }
+                return out;
+            });
+        }
+
+        // ─── Base price check (only when no variants) ───
+        if (finalVariants.length === 0) {
+            if (formData.price === "" || isNaN(Number(formData.price))) {
+                toast.error("দাম দিন");
+                return;
+            }
+        }
+
         const payload = {
             name: String(formData.name || "").trim(),
             slug: String(formData.slug || "").trim(),
             category: formData.category,
             description: String(formData.description || "").trim(),
-            price: Number(formData.price),
             stock: Number(formData.stock),
             images: formData.images,
             featured: !!formData.featured,
@@ -126,8 +214,13 @@ const AddProductForm = () => {
             bestSeller: !!formData.bestSeller,
         };
 
-        if (formData.oldPrice && formData.oldPrice !== "") {
-            payload.oldPrice = Number(formData.oldPrice);
+        if (finalVariants.length > 0) {
+            payload.variants = finalVariants;
+        } else {
+            payload.price = Number(formData.price);
+            if (formData.oldPrice && formData.oldPrice !== "") {
+                payload.oldPrice = Number(formData.oldPrice);
+            }
         }
 
         setSubmitting(true);
@@ -213,9 +306,7 @@ const AddProductForm = () => {
                         name="category"
                         placeholder="ক্যাটাগরি নির্বাচন করুন"
                         defaultSelectedKey={formData.category || undefined}
-                        onSelectionChange={(key) =>
-                            updateField("category", key ? String(key) : "")
-                        }
+                        onSelectionChange={handleCategoryChange}
                         className="w-full"
                     >
                         <Label className="font-body text-sm text-foreground">
@@ -264,53 +355,194 @@ const AddProductForm = () => {
                 </div>
             </Section>
 
+            {/* ─── Variants Section (only for attar) ─── */}
+            {showVariantsSection && (
+                <Section title="সাইজ ভ্যারিয়েন্ট (ঐচ্ছিক)">
+                    <label className="flex items-center gap-3 cursor-pointer mb-4">
+                        <input
+                            type="checkbox"
+                            checked={formData.variantsEnabled}
+                            onChange={(e) =>
+                                updateField(
+                                    "variantsEnabled",
+                                    e.target.checked
+                                )
+                            }
+                            className="w-4 h-4 accent-[var(--primary)]"
+                        />
+                        <span className="font-body text-sm text-foreground">
+                            এই পণ্যে একাধিক সাইজ যোগ করুন (২ml, ৪ml, ৬ml ইত্যাদি)
+                        </span>
+                    </label>
+
+                    {formData.variantsEnabled && (
+                        <>
+                            <div className="space-y-3 mb-4">
+                                {formData.variants.map((v, i) => (
+                                    <div
+                                        key={v.id}
+                                        className="grid grid-cols-2 md:grid-cols-[1fr_1fr_100px_100px_40px] gap-3 p-3 bg-background rounded-lg border border-border"
+                                    >
+                                        <div>
+                                            <label className="block font-body text-[10px] text-text-muted mb-1">
+                                                সাইজ কোড
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={v.size}
+                                                onChange={(e) =>
+                                                    updateVariant(
+                                                        v.id,
+                                                        "size",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="2ml"
+                                                className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-body text-[10px] text-text-muted mb-1">
+                                                লেবেল
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={v.label}
+                                                onChange={(e) =>
+                                                    updateVariant(
+                                                        v.id,
+                                                        "label",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="২ মিলি"
+                                                className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-body text-[10px] text-text-muted mb-1">
+                                                দাম (৳)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={v.price}
+                                                onChange={(e) =>
+                                                    updateVariant(
+                                                        v.id,
+                                                        "price",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="200"
+                                                className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-body text-[10px] text-text-muted mb-1">
+                                                পুরোনো দাম
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={v.oldPrice}
+                                                onChange={(e) =>
+                                                    updateVariant(
+                                                        v.id,
+                                                        "oldPrice",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="250"
+                                                className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary"
+                                            />
+                                        </div>
+                                        <div className="flex items-end col-span-2 md:col-span-1">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeVariant(v.id)
+                                                }
+                                                aria-label="Remove variant"
+                                                className="w-full md:w-9 h-9 flex items-center justify-center rounded-lg border border-border text-foreground hover:border-error hover:text-error transition"
+                                            >
+                                                <IoTrashOutline className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={addVariant}
+                                className="inline-flex items-center gap-2 text-sm font-body font-semibold text-primary hover:text-primary-hover transition"
+                            >
+                                <IoAdd className="w-4 h-4" />
+                                আরেকটা ভ্যারিয়েন্ট যোগ করুন
+                            </button>
+
+                            <p className="font-body text-xs text-text-muted mt-3">
+                                সবচেয়ে কম দামের variant কার্ডে দেখানো হবে।
+                            </p>
+                        </>
+                    )}
+                </Section>
+            )}
+
             <Section title="দাম ও স্টক">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-                    <TextField
-                        isRequired
-                        name="price"
-                        defaultValue={formData.price}
-                        validate={(v) => {
-                            if (v === "" || v === undefined)
-                                return "দাম আবশ্যক";
-                            const n = Number(v);
-                            if (isNaN(n) || n < 0) return "সঠিক দাম দিন";
-                            return null;
-                        }}
-                    >
-                        <Label className="font-body text-sm text-foreground">
-                            দাম (৳)
-                        </Label>
-                        <Input
-                            name="price"
-                            type="number"
-                            onChange={(e) =>
-                                updateField("price", e.target.value)
-                            }
-                            placeholder="850"
-                            className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                        />
-                        <FieldError className="text-xs text-error mt-1" />
-                    </TextField>
+                    {!(showVariantsSection && formData.variantsEnabled) && (
+                        <>
+                            <TextField
+                                isRequired
+                                name="price"
+                                defaultValue={formData.price}
+                                validate={(v) => {
+                                    if (v === "" || v === undefined)
+                                        return "দাম আবশ্যক";
+                                    const n = Number(v);
+                                    if (isNaN(n) || n < 0)
+                                        return "সঠিক দাম দিন";
+                                    return null;
+                                }}
+                            >
+                                <Label className="font-body text-sm text-foreground">
+                                    দাম (৳)
+                                </Label>
+                                <Input
+                                    name="price"
+                                    type="number"
+                                    onChange={(e) =>
+                                        updateField("price", e.target.value)
+                                    }
+                                    placeholder="850"
+                                    className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                                />
+                                <FieldError className="text-xs text-error mt-1" />
+                            </TextField>
 
-                    <TextField
-                        name="oldPrice"
-                        defaultValue={formData.oldPrice}
-                    >
-                        <Label className="font-body text-sm text-foreground">
-                            পুরোনো দাম (ঐচ্ছিক)
-                        </Label>
-                        <Input
-                            name="oldPrice"
-                            type="number"
-                            onChange={(e) =>
-                                updateField("oldPrice", e.target.value)
-                            }
-                            placeholder="1200"
-                            className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                        />
-                        <FieldError className="text-xs text-error mt-1" />
-                    </TextField>
+                            <TextField
+                                name="oldPrice"
+                                defaultValue={formData.oldPrice}
+                            >
+                                <Label className="font-body text-sm text-foreground">
+                                    পুরোনো দাম (ঐচ্ছিক)
+                                </Label>
+                                <Input
+                                    name="oldPrice"
+                                    type="number"
+                                    onChange={(e) =>
+                                        updateField(
+                                            "oldPrice",
+                                            e.target.value
+                                        )
+                                    }
+                                    placeholder="1200"
+                                    className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                                />
+                                <FieldError className="text-xs text-error mt-1" />
+                            </TextField>
+                        </>
+                    )}
 
                     <TextField
                         isRequired
@@ -327,7 +559,10 @@ const AddProductForm = () => {
                         }}
                     >
                         <Label className="font-body text-sm text-foreground">
-                            স্টক
+                            স্টক{" "}
+                            {showVariantsSection && formData.variantsEnabled
+                                ? "(সব সাইজের মোট)"
+                                : ""}
                         </Label>
                         <Input
                             name="stock"

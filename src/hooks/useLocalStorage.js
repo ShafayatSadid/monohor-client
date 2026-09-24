@@ -8,7 +8,23 @@ export function useLocalStorage(key, initialValue) {
         if (typeof window === "undefined") return initialValue;
         try {
             const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
+            if (!item) return initialValue;
+
+            const parsed = JSON.parse(item);
+
+            // ─── Merge: initialValue-এর missing keys যোগ করি ───
+            if (
+                parsed &&
+                typeof parsed === "object" &&
+                !Array.isArray(parsed) &&
+                initialValue &&
+                typeof initialValue === "object" &&
+                !Array.isArray(initialValue)
+            ) {
+                return { ...initialValue, ...parsed };
+            }
+
+            return parsed;
         } catch (err) {
             console.error("useLocalStorage read error:", err);
             return initialValue;

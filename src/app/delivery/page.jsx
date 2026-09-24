@@ -68,11 +68,11 @@ const ZONES = [
 const FAQS = [
     {
         q: "ডেলিভারি চার্জ কত?",
-        a: "সারা বাংলাদেশে একই ডেলিভারি চার্জ — ৳১৩৫। যেকোনো জায়গায়, যেকোনো পরিমাণ অর্ডারে।",
+        a: "সারা বাংলাদেশে একই ডেলিভারি চার্জ — ৳১৩৫। যেকোনো জায়গায়।",
     },
     {
         q: "কত দিনে পণ্য হাতে পাব?",
-        a: "ঢাকায় ১-২ কার্যদিবস, মেট্রো সিটিতে ৩-৪ কার্যদিবস এবং অন্যান্য জেলায় ৩-৫ কার্যদিবস।",
+        a: "ঢাকায় ১-২ কার্যদিবস, মেট্রো সিটিতে ২-৩ কার্যদিবস এবং অন্যান্য জেলায় ২-৩ কার্যদিবস।",
     },
     {
         q: "ডেলিভারি ম্যান আমাকে ফোন দেবে?",
@@ -335,7 +335,7 @@ export default function DeliveryPage() {
                                     <IoChevronDown className="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" />
                                 </summary>
                                 <div className="px-5 pb-4 pt-1 border-t border-border">
-                                    <p className="font-body text-sm text-text-muted leading-relaxed pt-3">
+                                    <p className="font-price text-sm text-text-muted leading-relaxed pt-3">
                                         {faq.a}
                                     </p>
                                 </div>

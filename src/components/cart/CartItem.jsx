@@ -22,21 +22,21 @@ const CartItem = ({ item }) => {
             });
             return;
         }
-        updateQty(item.slug, item.qty + 1);
+        updateQty(item.key, item.qty + 1);
     };
 
     const dec = () => {
         if (item.qty <= 1) return;
-        updateQty(item.slug, item.qty - 1);
+        updateQty(item.key, item.qty - 1);
     };
 
     const handleRemove = () => {
-        removeItem(item.slug);
+        removeItem(item.key);
         toast.success("কার্ট থেকে সরানো হয়েছে", { duration: 2000 });
     };
 
     const handleSaveForLater = () => {
-        saveForLater(item.slug);
+        saveForLater(item.key);
         toast.success("পরে কিনবেন তালিকায় যোগ হয়েছে", {
             duration: 2000,
         });
@@ -44,7 +44,6 @@ const CartItem = ({ item }) => {
 
     return (
         <div className="flex gap-3 md:gap-4 py-4 md:py-5 border-b border-border last:border-b-0">
-            {/* Image */}
             <Link
                 href={`/products/${item.slug}`}
                 className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-lg overflow-hidden border border-border bg-surface"
@@ -58,15 +57,21 @@ const CartItem = ({ item }) => {
                 />
             </Link>
 
-            {/* Info + Actions */}
             <div className="flex-1 min-w-0 flex flex-col">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                    <Link
-                        href={`/products/${item.slug}`}
-                        className="font-heading text-sm md:text-base font-bold text-foreground leading-snug line-clamp-2 hover:text-primary transition"
-                    >
-                        {item.name}
-                    </Link>
+                    <div className="min-w-0">
+                        <Link
+                            href={`/products/${item.slug}`}
+                            className="font-heading text-sm md:text-base font-bold text-foreground leading-snug line-clamp-2 hover:text-primary transition"
+                        >
+                            {item.name}
+                        </Link>
+                        {item.variantLabel && (
+                            <p className="font-body text-xs text-text-muted mt-0.5">
+                                সাইজ: {item.variantLabel}
+                            </p>
+                        )}
+                    </div>
 
                     <button
                         onClick={handleRemove}
@@ -77,7 +82,6 @@ const CartItem = ({ item }) => {
                     </button>
                 </div>
 
-                {/* Price */}
                 <div className="flex items-baseline gap-2 mb-2">
                     {item.oldPrice && item.oldPrice > item.price ? (
                         <>
@@ -101,9 +105,7 @@ const CartItem = ({ item }) => {
                     </p>
                 )}
 
-                {/* Bottom row: Qty + Save for later */}
                 <div className="flex items-center justify-between gap-2 mt-auto">
-                    {/* Quantity */}
                     <div className="flex items-center border border-border rounded-full overflow-hidden bg-surface">
                         <button
                             onClick={dec}
@@ -126,12 +128,10 @@ const CartItem = ({ item }) => {
                         </button>
                     </div>
 
-                    {/* Item total */}
-                    <span className="font-price text-sm md:text-base font-bold text-foreground hidden sm:inline">
+                    <span className="font-accent text-sm md:text-base font-bold text-foreground hidden sm:inline">
                         ৳{item.price * item.qty}
                     </span>
 
-                    {/* Save for later */}
                     <button
                         onClick={handleSaveForLater}
                         className="flex items-center gap-1 font-body text-xs text-text-muted hover:text-secondary transition"
