@@ -16,9 +16,11 @@ import {
     IoCubeOutline,
     IoDocumentTextOutline,
     IoSaveOutline,
+    IoPaperPlaneOutline,
+    IoCheckmarkCircle,
 } from "react-icons/io5";
 
-import { adminFetch } from "@/lib/adminApi";
+import { adminFetch, sendToSteadfast } from "@/lib/adminApi";
 import {
     OrderStatusBadge,
     PaymentStatusBadge,
@@ -78,22 +80,48 @@ export default function AdminOrderDetailPage() {
     const [savingStatus, setSavingStatus] = useState(false);
     const [savingPayment, setSavingPayment] = useState(false);
     const [savingNote, setSavingNote] = useState(false);
+    const [sendingSteadfast, setSendingSteadfast] = useState(false);
 
     // ─── Load order ───
     useEffect(() => {
         if (!id) return;
 
         const load = async () => {
-            const { ok, data } = await adminFetch(`/orders/${id}`);
-            if (!ok) {
-                toast.error(data.message || "অর্ডার পাওয়া যায়নি");
+            const [orderRes, productsRes] = await Promise.all([
+                adminFetch(`/orders/${id}`),
+                adminFetch("/products"),
+            ]);
+
+            if (!orderRes.ok) {
+                toast.error(
+                    orderRes.data.message || "অর্ডার পাওয়া যায়নি"
+                );
                 router.push("/admin/orders");
                 return;
             }
-            setOrder(data);
-            setStatus(data.orderStatus || "pending");
-            setPaymentStatus(data.paymentStatus || "cod-pending");
-            setNote(data.adminNote || "");
+
+            const productList = Array.isArray(productsRes.data)
+                ? productsRes.data
+                : productsRes.data?.products || [];
+
+            const imageMap = {};
+            productList.forEach((p) => {
+                imageMap[p.slug] = p.images?.[0] || null;
+            });
+
+            const orderData = orderRes.data;
+
+            if (orderData.items) {
+                orderData.items = orderData.items.map((item) => ({
+                    ...item,
+                    image: item.image || imageMap[item.slug] || null,
+                }));
+            }
+
+            setOrder(orderData);
+            setStatus(orderData.orderStatus || "pending");
+            setPaymentStatus(orderData.paymentStatus || "cod-pending");
+            setNote(orderData.adminNote || "");
             setLoading(false);
         };
         load();
@@ -118,7 +146,7 @@ export default function AdminOrderDetailPage() {
         toast.success("স্ট্যাটাস আপডেট হয়েছে");
     };
 
-    // ─── Update payment status ───
+    // ─── Update payment ───
     const handlePaymentChange = async (newPayment) => {
         setPaymentStatus(newPayment);
         setSavingPayment(true);
@@ -129,7 +157,7 @@ export default function AdminOrderDetailPage() {
         setSavingPayment(false);
 
         if (!ok) {
-            toast.error(data.message || "পেমেন্ট স্ট্যাটাস আপডেট হয়নি");
+            toast.error(data.message || "পেমেন্ট আপডেট হয়নি");
             setPaymentStatus(order.paymentStatus);
             return;
         }
@@ -154,6 +182,27 @@ export default function AdminOrderDetailPage() {
         toast.success("নোট সংরক্ষণ হয়েছে");
     };
 
+    // ─── Send to Steadfast ───
+    const handleSendToSteadfast = async () => {
+        const ok = window.confirm(
+            "Steadfast-এ পাঠাতে চান? পাঠানোর পরে অর্ডার শিপড হিসেবে চিহ্নিত হবে।"
+        );
+        if (!ok) return;
+
+        setSendingSteadfast(true);
+        const { ok: reqOk, data } = await sendToSteadfast(id);
+        setSendingSteadfast(false);
+
+        if (!reqOk) {
+            toast.error(data.message || "Steadfast-এ পাঠানো যায়নি");
+            return;
+        }
+
+        setOrder(data.order);
+        setStatus(data.order.orderStatus);
+        toast.success("Steadfast-এ সফলভাবে পাঠানো হয়েছে!");
+    };
+
     if (loading) {
         return (
             <div className="space-y-4">
@@ -173,9 +222,10 @@ export default function AdminOrderDetailPage() {
         ? `https://wa.me/${whatsappDigits}`
         : null;
 
+    const hasSteadfast = !!order.steadfast?.consignmentId;
+
     return (
         <div className="space-y-5">
-            {/* Back + header */}
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
                     href="/admin/orders"
@@ -251,10 +301,11 @@ export default function AdminOrderDetailPage() {
                             ))}
                         </div>
 
-                        {/* Totals */}
                         <div className="mt-4 pt-4 border-t border-border space-y-2">
                             <div className="flex justify-between font-body text-sm">
-                                <span className="text-text-muted">সাবটোটাল</span>
+                                <span className="text-text-muted">
+                                    সাবটোটাল
+                                </span>
                                 <span className="font-price font-semibold text-foreground">
                                     ৳{order.subtotal}
                                 </span>
@@ -330,13 +381,9 @@ export default function AdminOrderDetailPage() {
                                     )}
                                     {address.district}, {address.division}
                                 </div>
-                                <p className="font-body text-[11px] text-text-muted mt-2">
-                                    জোন: {address.deliveryZone}
-                                </p>
                             </div>
                         </div>
 
-                        {/* Contact buttons */}
                         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
                             <a
                                 href={`tel:${customer.phone}`}
@@ -360,7 +407,10 @@ export default function AdminOrderDetailPage() {
                     </Section>
 
                     {/* Admin Note */}
-                    <Section title="নোট" icon={IoDocumentTextOutline}>
+                    <Section
+                        title="নোট"
+                        icon={IoDocumentTextOutline}
+                    >
                         <textarea
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
@@ -374,7 +424,9 @@ export default function AdminOrderDetailPage() {
                             className="mt-3 inline-flex items-center gap-2 bg-secondary hover:bg-secondary/90 disabled:opacity-50 text-white font-body font-semibold text-sm px-5 py-2 rounded-full transition"
                         >
                             <IoSaveOutline className="w-4 h-4" />
-                            {savingNote ? "সংরক্ষণ হচ্ছে..." : "নোট সংরক্ষণ"}
+                            {savingNote
+                                ? "সংরক্ষণ হচ্ছে..."
+                                : "নোট সংরক্ষণ"}
                         </button>
                     </Section>
                 </div>
@@ -397,7 +449,10 @@ export default function AdminOrderDetailPage() {
                                     className="w-full px-3 py-2.5 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary cursor-pointer disabled:opacity-50"
                                 >
                                     {STATUS_OPTIONS.map((s) => (
-                                        <option key={s.value} value={s.value}>
+                                        <option
+                                            key={s.value}
+                                            value={s.value}
+                                        >
                                             {s.label}
                                         </option>
                                     ))}
@@ -411,13 +466,18 @@ export default function AdminOrderDetailPage() {
                                 <select
                                     value={paymentStatus}
                                     onChange={(e) =>
-                                        handlePaymentChange(e.target.value)
+                                        handlePaymentChange(
+                                            e.target.value
+                                        )
                                     }
                                     disabled={savingPayment}
                                     className="w-full px-3 py-2.5 rounded-lg bg-surface border border-border text-foreground font-body text-sm focus:outline-none focus:border-primary cursor-pointer disabled:opacity-50"
                                 >
                                     {PAYMENT_OPTIONS.map((s) => (
-                                        <option key={s.value} value={s.value}>
+                                        <option
+                                            key={s.value}
+                                            value={s.value}
+                                        >
                                             {s.label}
                                         </option>
                                     ))}
@@ -426,36 +486,71 @@ export default function AdminOrderDetailPage() {
                         </div>
                     </Section>
 
-                    {/* Steadfast — placeholder */}
+                    {/* Steadfast */}
                     <Section title="কুরিয়ার">
-                        {order.steadfast?.trackingCode ? (
+                        {hasSteadfast ? (
                             <div className="space-y-3">
+                                <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-lg p-3">
+                                    <IoCheckmarkCircle className="w-4 h-4 text-success shrink-0" />
+                                    <p className="font-body text-xs text-foreground">
+                                        Steadfast-এ পাঠানো হয়েছে
+                                    </p>
+                                </div>
+
                                 <div>
                                     <p className="font-body text-xs text-text-muted mb-0.5">
                                         Tracking Code
                                     </p>
-                                    <p className="font-price text-sm font-bold text-primary">
+                                    <p className="font-price text-base font-bold text-primary">
                                         {order.steadfast.trackingCode}
                                     </p>
                                 </div>
-                                <p className="font-body text-xs text-text-muted">
-                                    পাঠানো হয়েছে:{" "}
-                                    {formatDate(order.steadfast.sentAt)}
-                                </p>
+
+                                {order.steadfast.consignmentId && (
+                                    <div>
+                                        <p className="font-body text-xs text-text-muted mb-0.5">
+                                            Consignment ID
+                                        </p>
+                                        <p className="font-price text-sm font-semibold text-foreground">
+                                            {order.steadfast.consignmentId}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {order.steadfast.sentAt && (
+                                    <p className="font-body text-xs text-text-muted">
+                                        পাঠানো হয়েছে:{" "}
+                                        {formatDate(order.steadfast.sentAt)}
+                                    </p>
+                                )}
+
+                                <a
+                                    href={`https://portal.packzy.com/tracking/${order.steadfast.trackingCode}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block text-center font-body text-xs text-primary hover:underline"
+                                >
+                                    Steadfast-এ ট্র্যাক করুন →
+                                </a>
                             </div>
                         ) : (
-                            <div className="text-center py-2">
-                                <p className="font-body text-sm text-text-muted mb-4">
+                            <div>
+                                <p className="font-body text-sm text-text-muted mb-4 text-center">
                                     এখনো কুরিয়ারে পাঠানো হয়নি
                                 </p>
                                 <button
-                                    disabled
-                                    className="w-full bg-secondary/40 text-white font-body font-semibold text-sm px-5 py-2.5 rounded-full cursor-not-allowed"
+                                    onClick={handleSendToSteadfast}
+                                    disabled={sendingSteadfast}
+                                    className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover disabled:opacity-50 text-white font-body font-semibold text-sm px-5 py-2.5 rounded-full transition"
                                 >
-                                    স্টেডফাস্টে পাঠান (শীঘ্রই আসছে)
+                                    <IoPaperPlaneOutline className="w-4 h-4" />
+                                    {sendingSteadfast
+                                        ? "পাঠানো হচ্ছে..."
+                                        : "Steadfast-এ পাঠান"}
                                 </button>
-                                <p className="font-body text-[11px] text-text-muted mt-3">
-                                    গেটওয়ে সেটআপের পরে চালু হবে
+                                <p className="font-body text-[11px] text-text-muted mt-3 text-center leading-relaxed">
+                                    পাঠানোর আগে কাস্টমারকে কল দিয়ে কনফার্ম
+                                    করুন
                                 </p>
                             </div>
                         )}

@@ -108,7 +108,7 @@ const CheckoutForm = ({ onSubmit, submitting, errors }) => {
                         }}
                     >
                         <Label className="font-body text-sm text-foreground">
-                            ইমেইল (ঐচ্ছিক)
+                            ইমেইল
                         </Label>
                         <Input
                             name="email"
@@ -320,6 +320,7 @@ const CheckoutForm = ({ onSubmit, submitting, errors }) => {
             <Section title="বিশেষ নির্দেশনা (ঐচ্ছিক)">
                 <TextField
                     name="note"
+                    aria-label="বিশেষ নির্দেশনা"
                     validate={(v) => {
                         if (v && v.length > 500)
                             return "নোট ৫০০ অক্ষরের মধ্যে রাখুন";

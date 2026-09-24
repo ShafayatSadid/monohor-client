@@ -60,3 +60,10 @@ export async function updateProduct(id, payload) {
 export async function getProductBySlug(slug) {
     return adminFetch(`/products/${slug}`);
 }
+
+// lib/adminApi.js — নতুন function
+export async function sendToSteadfast(id) {
+    return adminFetch(`/orders/${id}/send-steadfast`, {
+        method: "POST",
+    });
+}
