@@ -5,14 +5,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import {
     IoHeartOutline,
     IoHeart,
     IoRemove,
     IoAdd,
-    IoStar,
-    IoStarHalf,
-    IoStarOutline,
 } from "react-icons/io5";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -22,17 +22,6 @@ const categoryNames = {
     bakhur: "বাখুর",
     "hater-kaj": "কুশিটাকার শিল্প",
     showpiece: "শোপিস",
-};
-
-const renderStars = (rating = 0) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-        if (rating >= i) stars.push(<IoStar key={i} className="w-4 h-4" />);
-        else if (rating >= i - 0.5)
-            stars.push(<IoStarHalf key={i} className="w-4 h-4" />);
-        else stars.push(<IoStarOutline key={i} className="w-4 h-4" />);
-    }
-    return stars;
 };
 
 const ProductInfo = ({ product }) => {
@@ -60,7 +49,6 @@ const ProductInfo = ({ product }) => {
         ? variants.find((v) => v.id === selectedVariantId) || variants[0]
         : null;
 
-    // Current effective price / old price
     const currentPrice = hasVariants
         ? Number(selectedVariant.price)
         : Number(product.price);
@@ -89,7 +77,6 @@ const ProductInfo = ({ product }) => {
     const inc = () => setQty((q) => Math.min(q + 1, product.stock || 1));
     const dec = () => setQty((q) => Math.max(1, q - 1));
 
-    // Reset qty when variant changes
     useEffect(() => {
         setQty(1);
     }, [selectedVariantId]);
@@ -146,15 +133,6 @@ const ProductInfo = ({ product }) => {
                 {product.name}
             </h1>
 
-            <div className="flex items-center gap-2 mb-4 md:mb-5">
-                <div className="flex items-center text-secondary">
-                    {renderStars(product.rating || 0)}
-                </div>
-                <span className="font-body text-xs text-text-muted">
-                    {(product.rating || 0).toFixed(1)} রেটিং
-                </span>
-            </div>
-
             {/* ─── Variant Selector ─── */}
             {hasVariants && (
                 <div className="mb-5 md:mb-6">
@@ -185,7 +163,7 @@ const ProductInfo = ({ product }) => {
                 </div>
             )}
 
-            {/* ─── Price (live) ─── */}
+            {/* ─── Price ─── */}
             <div className="flex items-baseline gap-3 mb-5 md:mb-6">
                 <span className="font-price text-2xl md:text-3xl font-extrabold text-primary">
                     ৳{currentPrice}
@@ -218,11 +196,16 @@ const ProductInfo = ({ product }) => {
                 )}
             </div>
 
-            {product.description && (
+            {/* ─── Description (Markdown) ─── */}
+            {product.description && product.description.trim() && (
                 <div className="mb-5 md:mb-6 pb-5 md:pb-6 border-b border-border">
-                    <p className="font-body text-sm md:text-base text-foreground/80 leading-relaxed">
-                        {product.description}
-                    </p>
+                    <div className="markdown-body">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                        >
+                            {product.description}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             )}
 

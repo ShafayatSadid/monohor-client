@@ -10,7 +10,6 @@ import {
     TextField,
     Label,
     Input,
-    TextArea,
     FieldError,
     Select,
     ListBox,
@@ -20,6 +19,7 @@ import { IoArrowBack, IoAdd, IoTrashOutline } from "react-icons/io5";
 
 import { createProduct } from "@/lib/adminApi";
 import ProductImageUploader from "./ProductImageUploader";
+import MarkdownEditor from "./MarkdownEditor";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const STORAGE_KEY = "monohor_add_product_form";
@@ -134,13 +134,11 @@ const AddProductForm = () => {
         }));
     };
 
-    // ─── Category change handler ───
     const handleCategoryChange = (value) => {
         const cat = value ? String(value) : "";
         setFormData((prev) => ({
             ...prev,
             category: cat,
-            // Category attar না হলে variants disable করে দিই
             ...(cat !== "attar"
                 ? { variantsEnabled: false, variants: [] }
                 : {}),
@@ -162,7 +160,6 @@ const AddProductForm = () => {
             return;
         }
 
-        // ─── Variant validation ───
         let finalVariants = [];
         if (showVariantsSection && formData.variantsEnabled) {
             if (formData.variants.length === 0) {
@@ -194,7 +191,6 @@ const AddProductForm = () => {
             });
         }
 
-        // ─── Base price check (only when no variants) ───
         if (finalVariants.length === 0) {
             if (formData.price === "" || isNaN(Number(formData.price))) {
                 toast.error("দাম দিন");
@@ -332,30 +328,21 @@ const AddProductForm = () => {
                         </Select.Popover>
                     </Select>
 
+                    {/* Description — Markdown */}
                     <div className="md:col-span-2">
-                        <TextField
-                            name="description"
-                            defaultValue={formData.description}
-                        >
-                            <Label className="font-body text-sm text-foreground">
-                                বর্ণনা (ঐচ্ছিক)
-                            </Label>
-                            <TextArea
-                                name="description"
-                                onChange={(e) =>
-                                    updateField("description", e.target.value)
-                                }
-                                placeholder="পণ্যের সংক্ষিপ্ত বর্ণনা..."
-                                rows={3}
-                                className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                            />
-                            <FieldError className="text-xs text-error mt-1" />
-                        </TextField>
+                        <Label className="block font-body text-sm text-foreground mb-3">
+                            বর্ণনা (ঐচ্ছিক) — Markdown supported
+                        </Label>
+                        <MarkdownEditor
+                            value={formData.description || ""}
+                            onChange={(v) => updateField("description", v)}
+                            placeholder="AI থেকে markdown format-এ description paste করুন..."
+                        />
                     </div>
                 </div>
             </Section>
 
-            {/* ─── Variants Section (only for attar) ─── */}
+            {/* ─── Variants Section ─── */}
             {showVariantsSection && (
                 <Section title="সাইজ ভ্যারিয়েন্ট (ঐচ্ছিক)">
                     <label className="flex items-center gap-3 cursor-pointer mb-4">
@@ -371,14 +358,15 @@ const AddProductForm = () => {
                             className="w-4 h-4 accent-[var(--primary)]"
                         />
                         <span className="font-body text-sm text-foreground">
-                            এই পণ্যে একাধিক সাইজ যোগ করুন (২ml, ৪ml, ৬ml ইত্যাদি)
+                            এই পণ্যে একাধিক সাইজ যোগ করুন (২ml, ৪ml, ৬ml
+                            ইত্যাদি)
                         </span>
                     </label>
 
                     {formData.variantsEnabled && (
                         <>
                             <div className="space-y-3 mb-4">
-                                {formData.variants.map((v, i) => (
+                                {formData.variants.map((v) => (
                                     <div
                                         key={v.id}
                                         className="grid grid-cols-2 md:grid-cols-[1fr_1fr_100px_100px_40px] gap-3 p-3 bg-background rounded-lg border border-border"

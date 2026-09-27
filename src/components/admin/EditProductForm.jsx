@@ -10,7 +10,6 @@ import {
     TextField,
     Label,
     Input,
-    TextArea,
     FieldError,
     Select,
     ListBox,
@@ -20,6 +19,7 @@ import { IoArrowBack, IoAdd, IoTrashOutline } from "react-icons/io5";
 
 import { getProductBySlug, updateProduct } from "@/lib/adminApi";
 import ProductImageUploader from "./ProductImageUploader";
+import MarkdownEditor from "./MarkdownEditor";
 
 const CATEGORIES = [
     { value: "attar", label: "আতর" },
@@ -43,12 +43,12 @@ const EditProductForm = ({ slug }) => {
     const [product, setProduct] = useState(null);
     const [images, setImages] = useState([]);
     const [category, setCategory] = useState("");
+    const [description, setDescription] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
     const [variantsEnabled, setVariantsEnabled] = useState(false);
     const [variants, setVariants] = useState([]);
 
-    // ─── Fetch product ───
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -61,6 +61,7 @@ const EditProductForm = ({ slug }) => {
                 setProduct(data);
                 setImages(data.images || []);
                 setCategory(data.category || "");
+                setDescription(data.description || "");
 
                 const hasVars =
                     Array.isArray(data.variants) && data.variants.length > 0;
@@ -86,7 +87,6 @@ const EditProductForm = ({ slug }) => {
         if (slug) fetchProduct();
     }, [slug, router]);
 
-    // ─── Variant helpers ───
     const addVariant = () => {
         setVariants((prev) => [
             ...prev,
@@ -110,7 +110,6 @@ const EditProductForm = ({ slug }) => {
         setVariants((prev) => prev.filter((v) => v.id !== id));
     };
 
-    // ─── Category change ───
     const handleCategoryChange = (value) => {
         const cat = value ? String(value) : "";
         setCategory(cat);
@@ -120,7 +119,6 @@ const EditProductForm = ({ slug }) => {
         }
     };
 
-    // ─── Submit ───
     const onSubmit = async (e) => {
         e.preventDefault();
 
@@ -134,7 +132,6 @@ const EditProductForm = ({ slug }) => {
             return;
         }
 
-        // ─── Variant validation ───
         let finalVariants = [];
         if (category === "attar" && variantsEnabled) {
             if (variants.length === 0) {
@@ -176,7 +173,7 @@ const EditProductForm = ({ slug }) => {
                 name: String(data.name || "").trim(),
                 slug: String(data.slug || "").trim(),
                 category,
-                description: String(data.description || "").trim(),
+                description: String(description || "").trim(),
                 stock: Number(data.stock),
                 images,
                 featured: data.featured === "on",
@@ -187,7 +184,6 @@ const EditProductForm = ({ slug }) => {
             if (finalVariants.length > 0) {
                 payload.variants = finalVariants;
             } else {
-                // No variants — explicitly empty + send price
                 payload.variants = [];
                 if (data.price !== undefined && data.price !== "") {
                     payload.price = Number(data.price);
@@ -217,7 +213,6 @@ const EditProductForm = ({ slug }) => {
         }
     };
 
-    // ─── Loading ───
     if (!product) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
@@ -244,7 +239,6 @@ const EditProductForm = ({ slug }) => {
                 </p>
             </div>
 
-            {/* ═══════════ মূল তথ্য ═══════════ */}
             <Section title="মূল তথ্য">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                     <TextField
@@ -319,27 +313,20 @@ const EditProductForm = ({ slug }) => {
                         </Select.Popover>
                     </Select>
 
+                    {/* Description — Markdown */}
                     <div className="md:col-span-2">
-                        <TextField
-                            name="description"
-                            defaultValue={product.description || ""}
-                        >
-                            <Label className="font-body text-sm text-foreground">
-                                বর্ণনা (ঐচ্ছিক)
-                            </Label>
-                            <TextArea
-                                name="description"
-                                placeholder="পণ্যের সংক্ষিপ্ত বর্ণনা..."
-                                rows={3}
-                                className="font-body rounded-lg bg-surface border border-border text-foreground focus:outline-none placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                            />
-                            <FieldError className="text-xs text-error mt-1" />
-                        </TextField>
+                        <Label className="block font-body text-sm text-foreground mb-3">
+                            বর্ণনা (ঐচ্ছিক) — Markdown supported
+                        </Label>
+                        <MarkdownEditor
+                            value={description}
+                            onChange={setDescription}
+                            placeholder="AI থেকে markdown format-এ description paste করুন..."
+                        />
                     </div>
                 </div>
             </Section>
 
-            {/* ═══════════ সাইজ ভ্যারিয়েন্ট (শুধু attar) ═══════════ */}
             {showVariantsSection && (
                 <Section title="সাইজ ভ্যারিয়েন্ট (ঐচ্ছিক)">
                     <label className="flex items-center gap-3 cursor-pointer mb-4">
@@ -470,7 +457,6 @@ const EditProductForm = ({ slug }) => {
                 </Section>
             )}
 
-            {/* ═══════════ দাম ও স্টক ═══════════ */}
             <Section title="দাম ও স্টক">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
                     {!(showVariantsSection && variantsEnabled) && (
@@ -553,12 +539,10 @@ const EditProductForm = ({ slug }) => {
                 </div>
             </Section>
 
-            {/* ═══════════ ছবি ═══════════ */}
             <Section title="ছবি">
                 <ProductImageUploader images={images} onChange={setImages} />
             </Section>
 
-            {/* ═══════════ প্রদর্শন সেটিংস ═══════════ */}
             <Section title="প্রদর্শন সেটিংস">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <label className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-secondary/60 bg-surface cursor-pointer transition">
@@ -614,7 +598,6 @@ const EditProductForm = ({ slug }) => {
                 </div>
             </Section>
 
-            {/* ═══════════ Submit ═══════════ */}
             <div className="flex items-center gap-3 justify-end">
                 <Link
                     href="/admin/products"
