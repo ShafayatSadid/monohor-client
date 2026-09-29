@@ -10,6 +10,7 @@ const titles = {
     "/admin/products/new": "নতুন পণ্য",
     "/admin/categories": "ক্যাটাগরি ব্যবস্থাপনা",
     "/admin/orders": "অর্ডার ব্যবস্থাপনা",
+    "/admin/reviews": "রিভিউ ব্যবস্থাপনা", 
     "/admin/users": "ইউজার ব্যবস্থাপনা",
 };
 

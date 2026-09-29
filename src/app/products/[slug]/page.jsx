@@ -7,11 +7,12 @@ import { getProduct, getProducts } from "@/lib/api";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
 import ProductInfo from "@/components/products/ProductInfo";
 import ProductSlider from "@/components/products/ProductSlider";
+import ReviewsSection from "@/components/products/ReviewsSection";
 
 const categoryNames = {
     attar: "আতর",
     bakhur: "বাখুর",
-    "hater-kaj": "কুশিটাকার কাজ",
+    "hater-kaj": "কুশিটাকার শিল্প",
     showpiece: "শোপিস",
 };
 
@@ -75,9 +76,12 @@ export default async function ProductDetailPage({ params }) {
                 <ProductInfo product={product} />
             </div>
 
+            {/* ─── Reviews Section ─── */}
+            <ReviewsSection productSlug={product.slug} />
+
             {/* Related products */}
             {related.length > 0 && (
-                <div className="-mx-5 md:-mx-10">
+                <div className="-mx-5 md:-mx-10 mt-12 md:mt-16">
                     <ProductSlider
                         tag="আরও দেখুন"
                         title="সম্পর্কিত পণ্য"

@@ -10,6 +10,7 @@ import {
     IoReceiptOutline,
     IoPeopleOutline,
     IoStorefrontOutline,
+    IoChatbubbleOutline,  
 } from "react-icons/io5";
 
 const links = [
@@ -17,6 +18,7 @@ const links = [
     { href: "/admin/products", label: "পণ্য", icon: IoCubeOutline },
     { href: "/admin/categories", label: "ক্যাটাগরি", icon: IoPricetagsOutline },
     { href: "/admin/orders", label: "অর্ডার", icon: IoReceiptOutline },
+    { href: "/admin/reviews", label: "রিভিউ", icon: IoChatbubbleOutline }, 
     { href: "/admin/users", label: "ইউজার", icon: IoPeopleOutline, disabled: true },
 ];
 

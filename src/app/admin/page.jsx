@@ -10,6 +10,7 @@ import {
     IoTimeOutline,
     IoCashOutline,
     IoAlertCircleOutline,
+    IoChatbubbleOutline,
 } from "react-icons/io5";
 
 import { adminFetch } from "@/lib/adminApi";
@@ -34,8 +35,8 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {[...Array(5)].map((_, i) => (
                     <div
                         key={i}
                         className="h-32 bg-surface border border-border rounded-xl animate-pulse"
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <StatsCard
                     icon={IoReceiptOutline}
                     label="মোট অর্ডার"
@@ -78,6 +79,17 @@ export default function AdminDashboard() {
                     value={`৳${stats.totalRevenue}`}
                     subtitle={`${stats.deliveredOrders}টি ডেলিভারড`}
                     color="success"
+                />
+                <StatsCard
+                    icon={IoChatbubbleOutline}
+                    label="পেন্ডিং রিভিউ"
+                    value={stats.pendingReviews || 0}
+                    subtitle={
+                        stats.pendingReviews > 0
+                            ? "যাচাই করা প্রয়োজন"
+                            : "সব যাচাই করা হয়েছে"
+                    }
+                    color="warning"
                 />
             </div>
 

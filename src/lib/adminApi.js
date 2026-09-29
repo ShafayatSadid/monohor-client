@@ -67,3 +67,30 @@ export async function sendToSteadfast(id) {
         method: "POST",
     });
 }
+
+
+// lib/adminApi.js — নতুন function যোগ করুন
+export async function getAdminReviews(status = "all") {
+    const query = status && status !== "all" ? `?status=${status}` : "";
+    return adminFetch(`/admin/reviews${query}`);
+}
+
+export async function approveReview(id) {
+    return adminFetch(`/admin/reviews/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "approved" }),
+    });
+}
+
+export async function rejectReview(id) {
+    return adminFetch(`/admin/reviews/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "rejected" }),
+    });
+}
+
+export async function deleteReview(id) {
+    return adminFetch(`/admin/reviews/${id}`, {
+        method: "DELETE",
+    });
+}
