@@ -34,7 +34,7 @@ const NavBar = () => {
         { slug: "attar", name: "আতর" },
         { slug: "bakhur", name: "বাখুর" },
         { slug: "showpiece", name: "শোপিস" },
-        { slug: "hater-kaj", name: "কুশিটাকার শিল্প" },
+        { slug: "hater-kaj", name: "কুশিকাটার শিল্প" },
     ];
 
     const handleSearch = (e) => {

@@ -13,7 +13,7 @@ import {
 export const metadata = {
     title: "আমাদের সম্পর্কে",
     description:
-        "মনোহর — বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিটাকার শিল্প ও শোপিসের বিশ্বস্ত ঠিকানা।",
+        "মনোহর — বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিকাটার শিল্প ও শোপিসের বিশ্বস্ত ঠিকানা।",
 };
 
 const features = [
@@ -42,7 +42,7 @@ const features = [
 const categories = [
     { slug: "attar", name: "আতর", desc: "খাঁটি সুগন্ধি" },
     { slug: "bakhur", name: "বাখুর", desc: "ধূপ ও উদ" },
-    { slug: "hater-kaj", name: "কুশিটাকার শিল্প", desc: "হাতে বোনা ঐতিহ্য" },
+    { slug: "hater-kaj", name: "কুশিকাটার শিল্প", desc: "হাতে বোনা ঐতিহ্য" },
     { slug: "showpiece", name: "শোপিস", desc: "ঘরের সাজ" },
 ];
 
@@ -77,7 +77,7 @@ export default function AboutPage() {
                 </h1>
                 <p className="font-body text-sm md:text-base text-text-muted max-w-2xl mx-auto leading-relaxed">
                     মনোহর একটি ছোট্ট স্বপ্ন — বাংলার ছড়িয়ে থাকা হস্তশিল্প,
-                    খাঁটি আতর আর ঐতিহ্যবাহী কুশিটাকার কাজ যেন সারা দেশের
+                    খাঁটি আতর আর ঐতিহ্যবাহী কুশিকাটার শিল্প কাজ যেন সারা দেশের
                     মানুষের ঘরে পৌঁছে যায়।
                 </p>
             </section>

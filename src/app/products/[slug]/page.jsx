@@ -12,7 +12,7 @@ import ReviewsSection from "@/components/products/ReviewsSection";
 const categoryNames = {
     attar: "আতর",
     bakhur: "বাখুর",
-    "hater-kaj": "কুশিটাকার শিল্প",
+    "hater-kaj": "কুশিকাটার শিল্প",
     showpiece: "শোপিস",
 };
 

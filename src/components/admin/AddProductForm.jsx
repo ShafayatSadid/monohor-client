@@ -27,7 +27,7 @@ const STORAGE_KEY = "monohor_add_product_form";
 const CATEGORIES = [
     { value: "attar", label: "আতর" },
     { value: "bakhur", label: "বাখুর" },
-    { value: "hater-kaj", label: "কুশিটাকার শিল্প" },
+    { value: "hater-kaj", label: "কুশিকাটার শিল্প" },
     { value: "showpiece", label: "শোপিস" },
 ];
 

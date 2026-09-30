@@ -18,9 +18,9 @@ export const metadata = {
         "মনোহরের সাথে যোগাযোগ করুন — ফোন, ইমেইল, WhatsApp অথবা সোশ্যাল মিডিয়ায়।",
 };
 
-const PHONE = "+8801700000000";
-const PHONE_DISPLAY = "+৮৮০ ১৭০০০০০০০০";
-const WHATSAPP = "8801700000000";
+const PHONE = "+8801410958840";
+const PHONE_DISPLAY = "+8801410958840";
+const WHATSAPP = "+8801410958840";
 const EMAIL = "hello@monohor.com.bd";
 
 const contactCards = [

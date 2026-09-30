@@ -18,7 +18,7 @@ const Footer = () => {
         { label: "সব পণ্য", href: "/products" },
         { label: "আতর", href: "/products?category=attar" },
         { label: "বাখুর", href: "/products?category=bakhur" },
-        { label: "কুশিটাকার শিল্প", href: "/products?category=hater-kaj" },
+        { label: "কুশিকাটার শিল্প", href: "/products?category=hater-kaj" },
         { label: "শোপিস", href: "/products?category=showpiece" },
     ];
 
@@ -54,7 +54,7 @@ const Footer = () => {
                         </Link>
 
                         <p className="font-body text-sm text-background/70 leading-relaxed max-w-md mb-5">
-                            বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিটাকার শিল্প ও শোপিসের বিশ্বস্ত ঠিকানা।
+                            বাংলার ঐতিহ্যবাহী আতর, বাখুর, কুশিকাটার শিল্প ও শোপিসের বিশ্বস্ত ঠিকানা।
                             হাতে তৈরি পণ্য, সারা দেশে ডেলিভারি।
                         </p>
 
@@ -67,10 +67,10 @@ const Footer = () => {
                             <li className="flex items-center gap-2">
                                 <IoCallOutline className="w-4 h-4 shrink-0 text-secondary" />
                                 <a
-                                    href="tel:+8801700000000"
+                                    href="tel:+8801410958840"
                                     className="hover:text-secondary transition"
-                                >
-                                    +৮৮০ ১৭০০০০০০০০
+                                >                                   
+                                    +8801410958840
                                 </a>
                             </li>
                             <li className="flex items-center gap-2">
@@ -169,7 +169,7 @@ const Footer = () => {
                             <IoLogoInstagram className="w-4 h-4" />
                         </a>
                         <a
-                            href="https://wa.me/8801700000000"
+                            href="https://wa.me/8801410958840"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp"
