@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "build": "next build --webpack",
+    "start": "next start"
   },
   "dependencies": {
     "@better-auth/mongo-adapter": "^1.7.4",
