@@ -7,6 +7,7 @@ import {
   Marcellus,
   
 } from "next/font/google";
+import MetaPixel from "@/components/shared/MetaPixel";
 
 import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }) {
         ${marcellus.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col mt-0">
+        <MetaPixel />
         <Toaster/>
         <NavBar />
         <main className="pt-17 md:pt-31 pb-18 md:pb-0 overflow-x-hidden w-full">

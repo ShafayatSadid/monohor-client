@@ -11,6 +11,7 @@ import { createOrder } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import { trackInitiateCheckout } from "@/lib/fbpixel";
 
 const DELIVERY_CHARGE = 135;
 
@@ -28,6 +29,23 @@ export default function CheckoutPage() {
             router.replace("/cart");
         }
     }, [items.length, router]);
+
+    // Meta Pixel — InitiateCheckout (fire once when page loads)
+    useEffect(() => {
+        if (items.length === 0) return;
+
+        const subtotal = items.reduce(
+            (sum, i) => sum + i.price * i.qty,
+            0
+        );
+        const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
+
+        trackInitiateCheckout({
+            value: subtotal,
+            numItems: totalItems,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSubmit = async (e, extras) => {
         const formData = new FormData(e.currentTarget);
@@ -84,7 +102,9 @@ export default function CheckoutPage() {
 
             clearCart();
             toast.success("অর্ডার সফলভাবে জমা হয়েছে!");
-            router.push(`/order-success?order=${result.orderNumber}`);
+            router.push(
+                `/order-success?order=${result.orderNumber}&total=${result.total}`
+            );
         } catch (err) {
             console.error(err);
             toast.error("কিছু ভুল হয়েছে");

@@ -8,6 +8,7 @@ import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { trackAddToCart } from "@/lib/fbpixel";
 
 const PLACEHOLDER_IMAGE = "/images/slide-1.webp";
 
@@ -54,6 +55,15 @@ const ProductCard = ({ product }) => {
             });
             return;
         }
+
+        // Meta Pixel — AddToCart
+        trackAddToCart({
+            id: product.slug,
+            name: product.name,
+            value: Number(product.price),
+            quantity: 1,
+            category: product.category,
+        });
 
         toast.success(`${product.name} কার্টে যোগ হয়েছে`, {
             duration: 2000,
@@ -147,7 +157,7 @@ const ProductCard = ({ product }) => {
                     {isOutOfStock
                         ? "স্টক নেই"
                         : productHasVariants
-                        ? "সাইজ দেখুন"
+                        ? "অর্ডার করুন"
                         : "কার্টে যোগ করুন"}
                 </Button>
             </div>

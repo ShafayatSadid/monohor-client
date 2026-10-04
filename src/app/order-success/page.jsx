@@ -1,14 +1,27 @@
 // app/order-success/page.js
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { IoCheckmarkCircle } from "react-icons/io5";
+import { trackPurchase } from "@/lib/fbpixel";
 
 function SuccessContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get("order") || "N/A";
+    const total = searchParams.get("total") || "0";
+
+    // Meta Pixel — Purchase (fire once)
+    useEffect(() => {
+        if (!orderNumber || orderNumber === "N/A") return;
+
+        trackPurchase({
+            value: Number(total),
+            orderId: orderNumber,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [orderNumber]);
 
     return (
         <div className="max-w-2xl mx-auto px-5 md:px-10 py-16 md:py-24 text-center">

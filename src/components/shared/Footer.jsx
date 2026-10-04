@@ -151,7 +151,7 @@ const Footer = () => {
                             ফলো করুন:
                         </span>
                         <a
-                            href="https://facebook.com"
+                            href="https://www.facebook.com/share/1C5nGtPgfg/"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Facebook"

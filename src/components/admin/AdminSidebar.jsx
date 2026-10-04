@@ -16,10 +16,9 @@ import {
 const links = [
     { href: "/admin", label: "ড্যাশবোর্ড", icon: IoGridOutline, exact: true },
     { href: "/admin/products", label: "পণ্য", icon: IoCubeOutline },
-    { href: "/admin/categories", label: "ক্যাটাগরি", icon: IoPricetagsOutline },
+
     { href: "/admin/orders", label: "অর্ডার", icon: IoReceiptOutline },
     { href: "/admin/reviews", label: "রিভিউ", icon: IoChatbubbleOutline }, 
-    { href: "/admin/users", label: "ইউজার", icon: IoPeopleOutline, disabled: true },
 ];
 
 const AdminSidebar = ({ mobileOpen, onClose }) => {

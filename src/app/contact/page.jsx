@@ -123,7 +123,7 @@ export default function ContactPage() {
                                 <p className="font-accent text-[10px] md:text-xs tracking-[0.2em] uppercase text-secondary mb-2">
                                     {c.label}
                                 </p>
-                                <p className="font-heading text-base md:text-lg font-bold text-foreground mb-3">
+                                <p className="font-price text-base md:text-lg font-bold text-foreground mb-3">
                                     {c.value}
                                 </p>
                                 {c.cta && (

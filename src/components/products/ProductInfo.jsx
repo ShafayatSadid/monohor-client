@@ -16,6 +16,7 @@ import {
 } from "react-icons/io5";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { trackViewContent, trackAddToCart } from "@/lib/fbpixel";
 
 const categoryNames = {
     attar: "আতর",
@@ -77,6 +78,18 @@ const ProductInfo = ({ product }) => {
     const inc = () => setQty((q) => Math.min(q + 1, product.stock || 1));
     const dec = () => setQty((q) => Math.max(1, q - 1));
 
+    // Meta Pixel — ViewContent (fire once per product)
+    useEffect(() => {
+        if (!product?.slug) return;
+        trackViewContent({
+            id: product.slug,
+            name: product.name,
+            value: product.price,
+            category: product.category,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product.slug]);
+
     useEffect(() => {
         setQty(1);
     }, [selectedVariantId]);
@@ -95,6 +108,15 @@ const ProductInfo = ({ product }) => {
             });
             return;
         }
+
+        // Meta Pixel — AddToCart
+        trackAddToCart({
+            id: product.slug,
+            name: product.name,
+            value: currentPrice * qty,
+            quantity: qty,
+            category: product.category,
+        });
 
         const variantText = hasVariants
             ? ` (${selectedVariant.label})`
@@ -149,7 +171,7 @@ const ProductInfo = ({ product }) => {
                                     onClick={() =>
                                         setSelectedVariantId(v.id)
                                     }
-                                    className={`px-4 py-2 rounded-full border font-body text-sm font-semibold transition ${
+                                    className={`px-4 py-2 rounded-full border font-price text-sm font-semibold transition ${
                                         active
                                             ? "bg-primary text-white border-primary"
                                             : "bg-surface border-border text-foreground hover:border-primary"
