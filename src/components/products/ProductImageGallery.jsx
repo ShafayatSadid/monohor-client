@@ -12,7 +12,8 @@ const FALLBACK_IMAGES = [
 ];
 
 const ProductImageGallery = ({ images = [], alt = "Product" }) => {
-    const gallery = images && images.length > 0 ? images : FALLBACK_IMAGES;
+    const gallery =
+        Array.isArray(images) && images.length > 0 ? images : FALLBACK_IMAGES;
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
@@ -42,6 +43,18 @@ const ProductImageGallery = ({ images = [], alt = "Product" }) => {
         };
     }, [emblaApi, onSelect]);
 
+    // ── reInit embla whenever the slide count changes so that
+    //    adding/removing images (e.g. admin edit → preview) works.
+    //    Also reset the selected index if it went out of bounds.
+    const slideCount = gallery.length;
+    useEffect(() => {
+        if (!emblaApi) return;
+        emblaApi.reInit();
+        if (emblaApi.selectedScrollSnap() >= slideCount) {
+            emblaApi.scrollTo(0);
+        }
+    }, [emblaApi, slideCount]);
+
     return (
         <div className="w-full">
             {/* Main Image */}
@@ -52,7 +65,7 @@ const ProductImageGallery = ({ images = [], alt = "Product" }) => {
                 <div className="flex">
                     {gallery.map((img, i) => (
                         <div
-                            key={i}
+                            key={`${img}-${i}`}
                             className="relative flex-[0_0_100%] min-w-0 aspect-square"
                         >
                             <Image
@@ -73,7 +86,7 @@ const ProductImageGallery = ({ images = [], alt = "Product" }) => {
                 <div className="grid grid-cols-4 gap-2 md:gap-3 mt-3 md:mt-4">
                     {gallery.map((img, i) => (
                         <button
-                            key={i}
+                            key={`${img}-${i}`}
                             onClick={() => scrollTo(i)}
                             aria-label={`Image ${i + 1}`}
                             className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${

@@ -3,37 +3,58 @@
 
 import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
+import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { IoAdd, IoClose } from "react-icons/io5";
 
-const ProductImageUploader = ({ images, onChange }) => {
+const MAX_IMAGES = 5;
+
+const ProductImageUploader = ({ images = [], onChange }) => {
+    // ── ref always mirrors the latest `images` so multi-fire onSuccess
+    //    callbacks never read a stale value (fixes the "only last image
+    //    survives" bug when uploading multiple files at once).
+    const imagesRef = useRef(images);
+
+    useEffect(() => {
+        imagesRef.current = images;
+    }, [images]);
+
     const handleSuccess = (result) => {
-        if (result.event !== "success") return;
+        if (result?.event !== "success") return;
 
         const url = result?.info?.secure_url;
         if (!url) return;
 
-        if (images.length >= 5) {
-            toast.error("সর্বোচ্চ ৫টি ছবি যোগ করা যাবে");
+        const current = imagesRef.current;
+
+        if (current.length >= MAX_IMAGES) {
+            toast.error(`সর্বোচ্চ ${MAX_IMAGES}টি ছবি যোগ করা যাবে`);
             return;
         }
 
-        if (images.includes(url)) return;
+        if (current.includes(url)) return;
 
-        onChange([...images, url]);
+        const next = [...current, url];
+        imagesRef.current = next; // update synchronously for the next callback
+        onChange?.(next);
         toast.success("ছবি আপলোড হয়েছে");
     };
 
     const handleRemove = (index) => {
-        onChange(images.filter((_, i) => i !== index));
+        const next = imagesRef.current.filter((_, i) => i !== index);
+        imagesRef.current = next;
+        onChange?.(next);
     };
+
+    const remainingSlots = Math.max(MAX_IMAGES - images.length, 0);
 
     return (
         <div>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                 {images.map((url, i) => (
                     <div
-                        key={i}
+                        // use url as key — stable across removals
+                        key={url}
                         className="relative aspect-square rounded-lg overflow-hidden border border-border group"
                     >
                         <Image
@@ -64,7 +85,7 @@ const ProductImageUploader = ({ images, onChange }) => {
                     </div>
                 ))}
 
-                {images.length < 5 && (
+                {remainingSlots > 0 && (
                     <CldUploadWidget
                         cloudName={
                             process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
@@ -76,7 +97,8 @@ const ProductImageUploader = ({ images, onChange }) => {
                         options={{
                             sources: ["local", "url", "camera"],
                             multiple: true,
-                            maxFiles: 5,
+                            // limit per-session to remaining slots, not 5
+                            maxFiles: remainingSlots,
                             maxFileSize: 5000000,
                             clientAllowedFormats: [
                                 "jpg",
@@ -104,9 +126,10 @@ const ProductImageUploader = ({ images, onChange }) => {
             </div>
 
             <p className="font-body text-xs text-text-muted mt-2">
-                সর্বোচ্চ ৫টি ছবি (৫MB max)। প্রথম ছবিটি প্রধান হিসেবে
-                দেখানো হবে।
-                {images.length > 0 && ` — ${images.length}/৫ যোগ হয়েছে`}
+                সর্বোচ্চ {MAX_IMAGES}টি ছবি (৫MB max)। প্রথম ছবিটি প্রধান
+                হিসেবে দেখানো হবে।
+                {images.length > 0 &&
+                    ` — ${images.length}/${MAX_IMAGES} যোগ হয়েছে`}
             </p>
         </div>
     );
