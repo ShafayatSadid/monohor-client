@@ -43,6 +43,8 @@ const ProductImageGallery = ({ images = [], alt = "Product" }) => {
         };
     }, [emblaApi, onSelect]);
 
+    
+
     // ── reInit embla whenever the slide count changes so that
     //    adding/removing images (e.g. admin edit → preview) works.
     //    Also reset the selected index if it went out of bounds.
